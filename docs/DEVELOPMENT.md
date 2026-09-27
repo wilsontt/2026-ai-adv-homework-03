@@ -81,17 +81,37 @@ router.use(authMiddleware, adminMiddleware);
 router.get('/profile', authMiddleware, (req, res) => { ... });
 ```
 
-5. **撰寫 JSDoc**（用於 OpenAPI 生成）：
+5. **定義 Zod schema 並註冊 OpenAPI path**：
 
 ```javascript
-/**
- * @openapi
- * /api/your-path:
- *   get:
- *     summary: 端點說明
- *     tags: [YourTag]
- *     ...
- */
+// src/schemas/yourFeature.schema.js
+const { z } = require('zod');
+const bodySchema = z.object({ name: z.string().min(1) });
+const requestSchema = z.object({ body: bodySchema, query: z.object({}), params: z.object({}) });
+module.exports = { bodySchema, requestSchema };
+
+// src/openapi/paths/yourFeature.paths.js
+const registry = require('../registry');
+const { bodySchema } = require('../../schemas/yourFeature.schema');
+registry.registerPath({
+  method: 'post',
+  path: '/api/your-path',
+  tags: ['YourTag'],
+  request: { body: { content: { 'application/json': { schema: bodySchema } } } },
+  responses: { 200: { description: '成功' } }
+});
+```
+
+路由檔改用 `validate(requestSchema)` middleware 取代手刻 if 驗證：
+
+```javascript
+const validate = require('../middleware/validate');
+const { requestSchema } = require('../schemas/yourFeature.schema');
+
+router.post('/', validate(requestSchema), (req, res) => {
+  const { name } = req.validated.body;
+  // ...
+});
 ```
 
 6. **撰寫測試**：在 `tests/` 下新增對應測試檔案
@@ -156,61 +176,49 @@ CREATE TABLE IF NOT EXISTS your_table (
 | `ECPAY_HASH_IV` | 綠界 HashIV | 選填（目前未使用） | — |
 | `ECPAY_ENV` | 綠界環境 | 選填（目前未使用） | `staging` |
 
-## JSDoc / OpenAPI 格式說明
+## Zod Schema / OpenAPI 格式說明
 
-路由檔案中使用 `@openapi` JSDoc 標記，供 `swagger-jsdoc` 解析生成 OpenAPI 3.0.3 規格。
+路由檔案改用 `src/schemas/*.schema.js` 定義 Zod schema，並在 `src/openapi/paths/*.paths.js` 呼叫 `registry.registerPath()` 註冊文件，由 `@asteasolutions/zod-to-openapi` 生成 OpenAPI 3.0.3 規格（見 `npm run openapi`）。
 
 ### 範例
 
 ```javascript
-/**
- * @openapi
- * /api/products:
- *   get:
- *     summary: 取得商品列表
- *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *     responses:
- *       200:
- *         description: 成功
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     products:
- *                       type: array
- *                       items:
- *                         type: object
- *                     pagination:
- *                       type: object
- *                 error:
- *                   type: string
- *                   nullable: true
- *                 message:
- *                   type: string
- */
+// src/schemas/example.schema.js
+const { z } = require('zod');
+
+const createExampleBodySchema = z.object({
+  name: z.string().min(1, 'name 為必填欄位')
+});
+
+module.exports = { createExampleBodySchema };
+```
+
+```javascript
+// src/openapi/paths/example.paths.js
+const registry = require('../registry');
+const { createExampleBodySchema } = require('../../schemas/example.schema');
+const { errorEnvelope } = require('../../schemas/common.schema');
+const { z } = require('zod');
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/examples',
+  tags: ['Example'],
+  request: { body: { content: { 'application/json': { schema: createExampleBodySchema } } } },
+  responses: {
+    201: { description: '建立成功', content: { 'application/json': { schema: errorEnvelope(z.object({ id: z.string() })) } } },
+    400: { description: '參數錯誤' }
+  }
+});
 ```
 
 ### 標記規則
 
 - `tags`：功能分類，使用 `[Auth]`、`[Products]`、`[Cart]`、`[Orders]`、`[Admin Products]`、`[Admin Orders]`
-- `security`：需認證的端點加上 `- bearerAuth: []`，購物車端點同時列出 `- sessionId: []`
+- `security`：需認證的端點加上 `security: [{ bearerAuth: [] }]`，購物車端點同時列出 `security: [{ bearerAuth: [] }, { sessionAuth: [] }]`
 - `responses`：每個可能的 HTTP 狀態碼都應列出（200/201/400/401/403/404/409）
-- 所有回應 schema 必須包含 `data`、`error`、`message` 三個頂層欄位
+- 所有回應 schema 必須包含 `data`、`error`、`message` 三個頂層欄位（以 `errorEnvelope(dataSchema)` 包裝）
+- `src/openapi/paths/*.js` 只能 require `src/schemas/*` 與 `src/openapi/registry.js`，不得 require 路由檔或 `src/database.js`
 
 ## 計畫歸檔流程
 

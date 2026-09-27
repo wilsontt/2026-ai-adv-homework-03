@@ -14,7 +14,7 @@
 | 前台頁面 | ✅ 完成 | EJS + Tailwind CSS |
 | 後台頁面 | ✅ 完成 | EJS + Tailwind CSS |
 | 測試 | ✅ 完成 | Vitest + supertest，6 個測試檔案 |
-| API 文件 | ✅ 完成 | Swagger/OpenAPI 生成 |
+| API 文件 | ✅ 完成 | Zod + zod-to-openapi 生成 OpenAPI，Swagger UI（/api-docs） |
 
 ---
 

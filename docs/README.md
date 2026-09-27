@@ -16,7 +16,7 @@
 | ID 生成 | uuid（v4） | ^11.1.0 |
 | CORS | cors | ^2.8.5 |
 | 環境變數 | dotenv | ^16.4.7 |
-| API 文件 | swagger-jsdoc | ^6.2.8 |
+| API 文件 | zod + @asteasolutions/zod-to-openapi | 依 package.json |
 | 測試框架 | Vitest | ^2.1.9 |
 | HTTP 測試 | supertest | ^7.2.2 |
 

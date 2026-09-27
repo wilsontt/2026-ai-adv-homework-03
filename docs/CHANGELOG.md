@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Changed
+- API 文件與輸入驗證改用 Zod + `@asteasolutions/zod-to-openapi`：新增 `src/schemas/*.schema.js`、`src/openapi/registry.js`、`src/openapi/paths/*.paths.js`、`src/openapi/generator.js`、`src/middleware/validate.js`，取代 `swagger-jsdoc` 與六個路由檔中手刻的 if 驗證
+- `generate-openapi.js` 產檔前以 `swagger-parser` 驗證規格合法性
+- 新增 `GET /api-docs` Swagger UI 瀏覽頁，`GET /openapi.json` 保留原路徑
+
 ### Added
 - 綠界 ECPay AIO 金流串接：結帳後導向綠界付款頁面完成真實付款流程
 - 新增 `src/utils/ecpay.js` 工具模組：CheckMacValue 簽章產生/驗證、ECPay 專用 URL 編碼、QueryTradeInfo API 查詢
