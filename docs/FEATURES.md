@@ -15,6 +15,7 @@
 | 後台頁面 | ✅ 完成 | EJS + Tailwind CSS |
 | 測試 | ✅ 完成 | Vitest + supertest，10 個測試檔案 |
 | API 文件 | ✅ 完成 | Zod + zod-to-openapi 生成 OpenAPI，Swagger UI（/api-docs） |
+| Postman Collection | ✅ 完成 | `npm run postman` 由 openapi.json 產生，含 environment 與自動帶入 token |
 
 ---
 

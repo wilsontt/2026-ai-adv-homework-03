@@ -11,6 +11,8 @@
 - **行為微調**：購物車 `quantity` 驗證改用 `z.union([z.number(), z.string().regex(/^\d+$/)])`，明確拒絕 boolean（如 `true`）與科學記號字串（如 `"1e2"`），修正原 `z.coerce.number()` 過於寬鬆意外將其轉換為合法數字的問題
 
 ### Added
+- 新增 `npm run postman`（`generate-postman.js` + `src/postman/generator.js`）：由 `openapi.json` 產生 `postman/collection.json`，並為登入／註冊請求自動注入 test script，將回應 token 寫入環境變數 `bearerToken`
+- 新增 `postman/environment.json`：含 `baseUrl`、`adminEmail`、`adminPassword`、`bearerToken` 四個變數，供匯入 Postman 直接測試 API
 - 新增 `GET /openapi.json`（回傳 OpenAPI document）與 `GET /api-docs` Swagger UI 瀏覽頁
 - 綠界 ECPay AIO 金流串接：結帳後導向綠界付款頁面完成真實付款流程
 - 新增 `src/utils/ecpay.js` 工具模組：CheckMacValue 簽章產生/驗證、ECPay 專用 URL 編碼、QueryTradeInfo API 查詢

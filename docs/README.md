@@ -43,7 +43,14 @@ npm run test
 
 # 6. 生成 OpenAPI 文件
 npm run openapi
+
+# 7. 生成 Postman Collection（需先執行過 npm run openapi）
+npm run postman
 ```
+
+### Postman
+
+`npm run postman` 會將 `openapi.json` 轉換為 `postman/collection.json`，並在 Postman 匯入 `postman/environment.json` 作為對應的 environment（含 `baseUrl`、`adminEmail`、`adminPassword`、`bearerToken` 四個變數）。呼叫 `POST /api/auth/login` 或 `/register` 成功後，回應中的 `token` 會經由內建的 Postman test script 自動寫入 `bearerToken`，其餘需要登入的請求即可直接送出，無須手動複製貼上。
 
 ### 預設帳號
 
@@ -63,6 +70,7 @@ npm run openapi
 | `npm run css:build` | 編譯並壓縮 CSS |
 | `npm run test` | 執行全部測試 |
 | `npm run openapi` | 生成 openapi.json |
+| `npm run postman` | 由 openapi.json 生成 postman/collection.json |
 
 ## 文件索引
 
