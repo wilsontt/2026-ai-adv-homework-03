@@ -4,6 +4,7 @@ const db = require('../database');
 const authMiddleware = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 const { queryTradeInfo } = require('../utils/ecpay');
+const { calculateShippingFee } = require('../utils/shipping');
 const {
   createOrderRequestSchema,
   listOrdersRequestSchema,
@@ -24,7 +25,7 @@ function generateOrderNo() {
 }
 
 router.post('/', validate(createOrderRequestSchema), (req, res) => {
-  const { recipientName, recipientEmail, recipientAddress } = req.validated.body;
+  const { recipientName, recipientEmail, recipientAddress, shippingMethod, isRemoteArea, isRushDelivery } = req.validated.body;
   const userId = req.user.userId;
 
   // Get cart items with product info
@@ -48,7 +49,9 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
   }
 
   // Calculate total
-  const totalAmount = cartItems.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
+  const shippingFee = calculateShippingFee({ shippingMethod, subtotal, isRemoteArea, isRushDelivery });
+  const totalAmount = subtotal + shippingFee;
 
   const orderId = uuidv4();
   const orderNo = generateOrderNo();
@@ -57,9 +60,13 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
   // Transaction: create order, order items, deduct stock, clear cart
   const createOrder = db.transaction(() => {
     db.prepare(
-      `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, total_amount, merchant_trade_no)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(orderId, orderNo, userId, recipientName, recipientEmail, recipientAddress, totalAmount, merchantTradeNo);
+      `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, shipping_method, shipping_fee, is_remote_area, is_rush_delivery, total_amount, merchant_trade_no)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      orderId, orderNo, userId, recipientName, recipientEmail, recipientAddress,
+      shippingMethod, shippingFee, isRemoteArea ? 1 : 0, isRushDelivery ? 1 : 0,
+      totalAmount, merchantTradeNo
+    );
 
     const insertItem = db.prepare(
       `INSERT INTO order_items (id, order_id, product_id, product_name, product_price, quantity)
@@ -86,6 +93,11 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
     data: {
       id: order.id,
       order_no: order.order_no,
+      subtotal,
+      shipping_method: order.shipping_method,
+      shipping_fee: order.shipping_fee,
+      is_remote_area: order.is_remote_area,
+      is_rush_delivery: order.is_rush_delivery,
       total_amount: order.total_amount,
       status: order.status,
       items: orderItems,

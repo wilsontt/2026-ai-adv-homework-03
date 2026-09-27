@@ -29,6 +29,7 @@ describe('Orders API', () => {
         recipientName: '測試收件人',
         recipientEmail: 'recipient@example.com',
         recipientAddress: '台北市測試路 123 號',
+        shippingMethod: 'home_delivery'
       });
 
     expect(res.status).toBe(201);
@@ -54,6 +55,7 @@ describe('Orders API', () => {
         recipientName: '測試收件人',
         recipientEmail: 'recipient@example.com',
         recipientAddress: '台北市測試路 123 號',
+        shippingMethod: 'home_delivery'
       });
 
     expect(res.status).toBe(400);
@@ -170,5 +172,157 @@ describe('Orders API', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should calculate shipping fee correctly and include it in total_amount', async () => {
+    const { token } = await registerUser();
+    const prodRes = await request(app).get('/api/products');
+    const cheapProduct = prodRes.body.data.products.find((p) => p.price < 1500);
+
+    await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: cheapProduct.id, quantity: 1 });
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '運費測試',
+        recipientEmail: 'shipping-test@example.com',
+        recipientAddress: '台北市運費測試路 1 號',
+        shippingMethod: 'home_delivery'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(cheapProduct.price);
+    expect(res.body.data.shipping_method).toBe('home_delivery');
+    expect(res.body.data.shipping_fee).toBe(120);
+    expect(res.body.data.total_amount).toBe(cheapProduct.price + 120);
+  });
+
+  it('should apply convenience_store base fee plus remote area and rush surcharges together', async () => {
+    const { token } = await registerUser();
+    const prodRes = await request(app).get('/api/products');
+    const cheapProduct = prodRes.body.data.products.find((p) => p.price < 1500);
+
+    await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: cheapProduct.id, quantity: 1 });
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '超商急件測試',
+        recipientEmail: 'store-rush-test@example.com',
+        recipientAddress: '台北市超商急件測試路 1 號',
+        shippingMethod: 'convenience_store',
+        isRemoteArea: true,
+        isRushDelivery: true
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.shipping_fee).toBe(60 + 200 + 250);
+    expect(res.body.data.total_amount).toBe(cheapProduct.price + 60 + 200 + 250);
+  });
+
+  it('should waive the base shipping fee when subtotal reaches 1500, but still charge surcharges', async () => {
+    const { token } = await registerUser();
+    const prodRes = await request(app).get('/api/products');
+    const expensiveProduct = prodRes.body.data.products.find((p) => p.price >= 1500);
+
+    await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: expensiveProduct.id, quantity: 1 });
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '滿額免運測試',
+        recipientEmail: 'free-shipping-test@example.com',
+        recipientAddress: '台北市滿額免運測試路 1 號',
+        shippingMethod: 'home_delivery',
+        isRemoteArea: true
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(expensiveProduct.price);
+    expect(res.body.data.shipping_fee).toBe(200);
+    expect(res.body.data.total_amount).toBe(expensiveProduct.price + 200);
+  });
+
+  it('should ignore a forged shippingFee/totalAmount in the request body and always recompute server-side', async () => {
+    const { token } = await registerUser();
+    const prodRes = await request(app).get('/api/products');
+    const cheapProduct = prodRes.body.data.products.find((p) => p.price < 1500);
+
+    await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: cheapProduct.id, quantity: 1 });
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '偽造金額測試',
+        recipientEmail: 'forged-amount-test@example.com',
+        recipientAddress: '台北市偽造金額測試路 1 號',
+        shippingMethod: 'home_delivery',
+        shippingFee: 0,
+        totalAmount: 1
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.shipping_fee).toBe(120);
+    expect(res.body.data.total_amount).toBe(cheapProduct.price + 120);
+  });
+
+  it('should carry the new shipping fields through GET /:id, PATCH /:id/pay and POST /:id/check-payment without extra code', async () => {
+    const { token } = await registerUser();
+    const prodRes = await request(app).get('/api/products');
+    const cheapProduct = prodRes.body.data.products.find((p) => p.price < 1500);
+
+    await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: cheapProduct.id, quantity: 1 });
+
+    const createRes = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '欄位透傳測試',
+        recipientEmail: 'passthrough-test@example.com',
+        recipientAddress: '台北市欄位透傳測試路 1 號',
+        shippingMethod: 'convenience_store',
+        isRushDelivery: true
+      });
+    const newOrderId = createRes.body.data.id;
+
+    const detailRes = await request(app)
+      .get(`/api/orders/${newOrderId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(detailRes.body.data.shipping_method).toBe('convenience_store');
+    expect(detailRes.body.data.shipping_fee).toBe(60 + 250);
+    expect(!!detailRes.body.data.is_rush_delivery).toBe(true);
+
+    const payRes = await request(app)
+      .patch(`/api/orders/${newOrderId}/pay`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ action: 'success' });
+    expect(payRes.body.data.shipping_fee).toBe(60 + 250);
+
+    // check-payment on an already-paid (non-pending) order takes the early-return
+    // branch that also just spreads { ...order, items } without calling ECPay
+    const checkRes = await request(app)
+      .post(`/api/orders/${newOrderId}/check-payment`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(checkRes.status).toBe(200);
+    expect(checkRes.body.data.shipping_fee).toBe(60 + 250);
   });
 });
