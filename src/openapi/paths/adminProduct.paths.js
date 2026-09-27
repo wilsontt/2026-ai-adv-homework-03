@@ -6,7 +6,7 @@ const {
   listAdminProductsResponseSchema
 } = require('../../schemas/adminProduct.schema');
 const { productSchema } = require('../../schemas/product.schema');
-const { errorEnvelope } = require('../../schemas/common.schema');
+const { errorEnvelope, pageQuerySchema, limitQuerySchema } = require('../../schemas/common.schema');
 
 registry.registerPath({
   method: 'get',
@@ -15,8 +15,8 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: z.object({
-      page: z.string().optional(),
-      limit: z.string().optional()
+      page: pageQuerySchema.optional(),
+      limit: limitQuerySchema.optional()
     })
   },
   responses: {
@@ -49,6 +49,7 @@ registry.registerPath({
   },
   responses: {
     200: { description: '商品更新成功', content: { 'application/json': { schema: errorEnvelope(productSchema) } } },
+    400: { description: '參數錯誤' },
     404: { description: '商品不存在' }
   }
 });

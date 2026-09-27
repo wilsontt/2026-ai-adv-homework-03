@@ -19,7 +19,8 @@ registry.registerPath({
   request: { body: { content: { 'application/json': { schema: createOrderBodySchema } } } },
   responses: {
     201: { description: '訂單建立成功', content: { 'application/json': { schema: errorEnvelope(orderRecordSchema) } } },
-    400: { description: '購物車為空或庫存不足或收件資訊缺失' }
+    400: { description: '購物車為空或庫存不足或收件資訊缺失' },
+    401: { description: '未登入或 token 無效' }
   }
 });
 
@@ -29,7 +30,8 @@ registry.registerPath({
   tags: ['Orders'],
   security: [{ bearerAuth: [] }],
   responses: {
-    200: { description: '成功', content: { 'application/json': { schema: errorEnvelope(listOrdersResponseSchema) } } }
+    200: { description: '成功', content: { 'application/json': { schema: errorEnvelope(listOrdersResponseSchema) } } },
+    401: { description: '未登入或 token 無效' }
   }
 });
 
@@ -41,6 +43,7 @@ registry.registerPath({
   request: { params: idParam },
   responses: {
     200: { description: '成功', content: { 'application/json': { schema: errorEnvelope(orderDetailSchema) } } },
+    401: { description: '未登入或 token 無效' },
     404: { description: '訂單不存在' }
   }
 });
@@ -54,6 +57,7 @@ registry.registerPath({
   responses: {
     200: { description: '付款狀態更新成功', content: { 'application/json': { schema: errorEnvelope(orderRecordSchema) } } },
     400: { description: 'action 無效或訂單狀態不是 pending' },
+    401: { description: '未登入或 token 無效' },
     404: { description: '訂單不存在' }
   }
 });
@@ -67,6 +71,7 @@ registry.registerPath({
   responses: {
     200: { description: '查詢成功' },
     400: { description: '訂單狀態不是 pending' },
+    401: { description: '未登入或 token 無效' },
     404: { description: '訂單不存在' }
   }
 });

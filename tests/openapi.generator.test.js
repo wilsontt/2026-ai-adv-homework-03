@@ -16,4 +16,16 @@ describe('OpenAPI generator', () => {
     });
     expect(tags).toEqual(new Set(['Auth', 'Cart', 'Orders', 'Products', 'Admin Orders', 'Admin Products']));
   });
+
+  it('documents page/limit query params as integer with default/range, reusing the runtime schema (not hand-written strings)', () => {
+    const document = generateDocument();
+    const params = document.paths['/api/products'].get.parameters;
+    const page = params.find((p) => p.name === 'page');
+    const limit = params.find((p) => p.name === 'limit');
+
+    expect(page.schema).toMatchObject({ type: 'integer', default: 1, minimum: 1 });
+    expect(page.required).toBe(false);
+    expect(limit.schema).toMatchObject({ type: 'integer', default: 10, minimum: 1, maximum: 100 });
+    expect(limit.required).toBe(false);
+  });
 });

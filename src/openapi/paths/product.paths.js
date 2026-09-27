@@ -1,7 +1,7 @@
 const { z } = require('zod');
 const registry = require('../registry');
 const { productSchema, listProductsResponseSchema } = require('../../schemas/product.schema');
-const { errorEnvelope } = require('../../schemas/common.schema');
+const { errorEnvelope, pageQuerySchema, limitQuerySchema } = require('../../schemas/common.schema');
 
 registry.registerPath({
   method: 'get',
@@ -9,8 +9,8 @@ registry.registerPath({
   tags: ['Products'],
   request: {
     query: z.object({
-      page: z.string().optional(),
-      limit: z.string().optional()
+      page: pageQuerySchema.optional(),
+      limit: limitQuerySchema.optional()
     })
   },
   responses: {

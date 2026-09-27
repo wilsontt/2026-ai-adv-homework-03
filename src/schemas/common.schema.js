@@ -1,4 +1,7 @@
 const { z } = require('zod');
+const { extendZodWithOpenApi } = require('@asteasolutions/zod-to-openapi');
+
+extendZodWithOpenApi(z);
 
 function normalizePage(val) {
   const n = parseInt(val, 10);
@@ -11,8 +14,17 @@ function normalizeLimit(val) {
   return Math.max(1, Math.min(100, base));
 }
 
-const pageQuerySchema = z.preprocess(normalizePage, z.number().int());
-const limitQuerySchema = z.preprocess(normalizeLimit, z.number().int());
+const pageQuerySchema = z.preprocess(normalizePage, z.number().int()).openapi({
+  type: 'integer',
+  default: 1,
+  minimum: 1
+});
+const limitQuerySchema = z.preprocess(normalizeLimit, z.number().int()).openapi({
+  type: 'integer',
+  default: 10,
+  minimum: 1,
+  maximum: 100
+});
 
 const paginationSchema = z.object({
   total: z.number(),
