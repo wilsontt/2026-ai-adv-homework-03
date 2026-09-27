@@ -341,6 +341,7 @@ server.js
 | recipient_name | TEXT | NOT NULL | 收件人姓名 |
 | recipient_email | TEXT | NOT NULL | 收件人 Email |
 | recipient_address | TEXT | NOT NULL | 收件地址 |
+| subtotal | INTEGER | 可為 NULL | 商品小計（不含運費），遷移前建立的舊訂單為 NULL |
 | shipping_method | TEXT | 可為 NULL | 配送方式：home_delivery（宅配）或 convenience_store（超商取貨） |
 | shipping_fee | INTEGER | 可為 NULL | 依配送方式、偏遠地區、當日急件、滿額免運規則計算之運費 |
 | is_remote_area | INTEGER | 可為 NULL，0/1 | 是否為偏遠地區（加收 200 元） |

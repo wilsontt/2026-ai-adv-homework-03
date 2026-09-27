@@ -730,19 +730,54 @@
                           "type": "string"
                         },
                         "subtotal": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "shipping_method": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "shipping_fee": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "is_remote_area": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "is_rush_delivery": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "total_amount": {
                           "type": "number"
@@ -943,19 +978,54 @@
                           "type": "string"
                         },
                         "subtotal": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "shipping_method": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "shipping_fee": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "is_remote_area": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "is_rush_delivery": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "total_amount": {
                           "type": "number"
@@ -1109,19 +1179,54 @@
                           "type": "string"
                         },
                         "subtotal": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "shipping_method": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "shipping_fee": {
-                          "type": "number"
+                          "type": "number",
+                          "nullable": true
                         },
                         "is_remote_area": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "is_rush_delivery": {
-                          "type": "boolean"
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "enum": [
+                                0
+                              ]
+                            },
+                            {
+                              "type": "number",
+                              "enum": [
+                                1
+                              ]
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
                         },
                         "total_amount": {
                           "type": "number"

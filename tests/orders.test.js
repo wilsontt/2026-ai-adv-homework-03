@@ -1,4 +1,5 @@
-const { app, request, registerUser } = require('./setup');
+const { app, request, registerUser, getAdminToken } = require('./setup');
+const db = require('../src/database');
 
 describe('Orders API', () => {
   let userToken;
@@ -307,6 +308,7 @@ describe('Orders API', () => {
     const detailRes = await request(app)
       .get(`/api/orders/${newOrderId}`)
       .set('Authorization', `Bearer ${token}`);
+    expect(detailRes.body.data.subtotal).toBe(cheapProduct.price);
     expect(detailRes.body.data.shipping_method).toBe('convenience_store');
     expect(detailRes.body.data.shipping_fee).toBe(60 + 250);
     expect(!!detailRes.body.data.is_rush_delivery).toBe(true);
@@ -315,6 +317,7 @@ describe('Orders API', () => {
       .patch(`/api/orders/${newOrderId}/pay`)
       .set('Authorization', `Bearer ${token}`)
       .send({ action: 'success' });
+    expect(payRes.body.data.subtotal).toBe(cheapProduct.price);
     expect(payRes.body.data.shipping_fee).toBe(60 + 250);
 
     // check-payment on an already-paid (non-pending) order takes the early-return
@@ -324,5 +327,83 @@ describe('Orders API', () => {
       .set('Authorization', `Bearer ${token}`);
     expect(checkRes.status).toBe(200);
     expect(checkRes.body.data.shipping_fee).toBe(60 + 250);
+  });
+
+  it('should still return a legacy order (pre-migration, shipping fields NULL) without crashing', async () => {
+    const { token, user } = await registerUser();
+    const legacyOrderId = 'legacy-' + Date.now();
+
+    db.prepare(
+      `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, total_amount)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(legacyOrderId, 'ORD-LEGACY-' + Date.now(), user.id, '舊訂單收件人', 'legacy@example.com', '台北市舊訂單路 1 號', 999);
+
+    const res = await request(app)
+      .get(`/api/orders/${legacyOrderId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.total_amount).toBe(999);
+    expect(res.body.data.subtotal).toBeNull();
+    expect(res.body.data.shipping_method).toBeNull();
+    expect(res.body.data.shipping_fee).toBeNull();
+  });
+
+  it('should waive the base fee at exactly 1500 subtotal (integration-level boundary)', async () => {
+    const { token } = await registerUser();
+    const products = await request(app).get('/api/products').then((r) => r.body.data.products);
+    const tulip = products.find((p) => p.price === 750 && p.stock >= 2);
+
+    const addRes = await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: tulip.id, quantity: 2 });
+    expect(addRes.status).toBe(200);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '邊界測試 1500',
+        recipientEmail: 'boundary-1500@example.com',
+        recipientAddress: '台北市邊界測試路 1 號',
+        shippingMethod: 'home_delivery'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(1500);
+    expect(res.body.data.shipping_fee).toBe(0);
+    expect(res.body.data.total_amount).toBe(1500);
+  });
+
+  it('should still charge the base fee at exactly 1499 subtotal (integration-level boundary)', async () => {
+    const adminToken = await getAdminToken();
+    const createProductRes = await request(app)
+      .post('/api/admin/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: '邊界測試商品 1499', price: 1499, stock: 5 });
+    const boundaryProductId = createProductRes.body.data.id;
+
+    const { token } = await registerUser();
+    const addRes = await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: boundaryProductId, quantity: 1 });
+    expect(addRes.status).toBe(200);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '邊界測試 1499',
+        recipientEmail: 'boundary-1499@example.com',
+        recipientAddress: '台北市邊界測試路 2 號',
+        shippingMethod: 'home_delivery'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(1499);
+    expect(res.body.data.shipping_fee).toBe(120);
+    expect(res.body.data.total_amount).toBe(1619);
   });
 });

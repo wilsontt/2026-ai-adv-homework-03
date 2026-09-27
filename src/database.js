@@ -77,6 +77,11 @@ function initializeDatabase() {
 
   // Migration: add shipping fields for shipping fee module
   try {
+    db.exec(`ALTER TABLE orders ADD COLUMN subtotal INTEGER`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
+  try {
     db.exec(`ALTER TABLE orders ADD COLUMN shipping_method TEXT`);
   } catch (e) {
     // Column already exists, ignore

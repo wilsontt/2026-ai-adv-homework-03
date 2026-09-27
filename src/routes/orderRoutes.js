@@ -60,11 +60,11 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
   // Transaction: create order, order items, deduct stock, clear cart
   const createOrder = db.transaction(() => {
     db.prepare(
-      `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, shipping_method, shipping_fee, is_remote_area, is_rush_delivery, total_amount, merchant_trade_no)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, subtotal, shipping_method, shipping_fee, is_remote_area, is_rush_delivery, total_amount, merchant_trade_no)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       orderId, orderNo, userId, recipientName, recipientEmail, recipientAddress,
-      shippingMethod, shippingFee, isRemoteArea ? 1 : 0, isRushDelivery ? 1 : 0,
+      subtotal, shippingMethod, shippingFee, isRemoteArea ? 1 : 0, isRushDelivery ? 1 : 0,
       totalAmount, merchantTradeNo
     );
 

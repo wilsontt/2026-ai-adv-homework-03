@@ -39,14 +39,17 @@ const orderItemDetailSchema = z.object({
   quantity: z.number()
 });
 
+// SQLite 儲存 0/1，且遷移前建立的舊訂單這些欄位皆為 NULL，故一律宣告為可為 NULL 的 0/1 數字（非 boolean）
+const shippingFlagSchema = z.union([z.literal(0), z.literal(1)]).nullable();
+
 const orderRecordSchema = z.object({
   id: z.string(),
   order_no: z.string(),
-  subtotal: z.number(),
-  shipping_method: z.string(),
-  shipping_fee: z.number(),
-  is_remote_area: z.boolean(),
-  is_rush_delivery: z.boolean(),
+  subtotal: z.number().nullable(),
+  shipping_method: z.string().nullable(),
+  shipping_fee: z.number().nullable(),
+  is_remote_area: shippingFlagSchema,
+  is_rush_delivery: shippingFlagSchema,
   total_amount: z.number(),
   status: z.string(),
   created_at: z.string(),
@@ -60,11 +63,11 @@ const orderDetailSchema = z.object({
   recipient_name: z.string(),
   recipient_email: z.string(),
   recipient_address: z.string(),
-  subtotal: z.number(),
-  shipping_method: z.string(),
-  shipping_fee: z.number(),
-  is_remote_area: z.boolean(),
-  is_rush_delivery: z.boolean(),
+  subtotal: z.number().nullable(),
+  shipping_method: z.string().nullable(),
+  shipping_fee: z.number().nullable(),
+  is_remote_area: shippingFlagSchema,
+  is_rush_delivery: shippingFlagSchema,
   total_amount: z.number(),
   status: z.string(),
   merchant_trade_no: z.string().nullable(),
