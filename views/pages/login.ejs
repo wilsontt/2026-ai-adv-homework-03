@@ -33,6 +33,7 @@
             placeholder="請輸入 Email"
             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary"
             :class="{ 'border-red-400': errors.email }"
+            data-testid="login-email"
           />
           <p v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
         </div>
@@ -45,6 +46,7 @@
             placeholder="請輸入密碼"
             class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary"
             :class="{ 'border-red-400': errors.password }"
+            data-testid="login-password"
           />
           <p v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
         </div>
@@ -53,6 +55,7 @@
           type="submit"
           :disabled="submitting"
           class="w-full bg-rose-primary text-white py-3 rounded-full text-sm font-medium hover:bg-rose-dark transition-colors disabled:opacity-50"
+          data-testid="login-submit"
         >
           {{ submitting ? '登入中...' : '登入' }}
         </button>
