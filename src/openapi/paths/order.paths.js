@@ -19,7 +19,7 @@ registry.registerPath({
   request: { body: { content: { 'application/json': { schema: createOrderBodySchema } } } },
   responses: {
     201: { description: '訂單建立成功', content: { 'application/json': { schema: errorEnvelope(orderRecordSchema) } } },
-    400: { description: '購物車為空或庫存不足或收件資訊缺失' },
+    400: { description: '購物車為空或庫存不足或收件資訊缺失或配送方式無效' },
     401: { description: '未登入或 token 無效' }
   }
 });

@@ -1,15 +1,15 @@
 {
   "item": [
     {
-      "id": "9dcb0176-fc87-41c8-a132-950c2a25ac2c",
+      "id": "8a88b7cc-e250-4e45-9189-ce2ececbe850",
       "name": "api",
       "item": [
         {
-          "id": "c442340c-5335-420f-8fdd-cd5a468c1483",
+          "id": "2a28c687-1698-4b9b-97ea-a90a7c48443c",
           "name": "auth",
           "item": [
             {
-              "id": "7fe6c44c-037c-400e-b72d-79d0f8bf59b9",
+              "id": "807e0203-d0c7-4493-bb78-80dc93fffc6c",
               "name": "/api/auth/register",
               "request": {
                 "name": "/api/auth/register",
@@ -50,7 +50,7 @@
               },
               "response": [
                 {
-                  "id": "710b47b7-c335-4035-9133-e4da1a8874e8",
+                  "id": "b858d160-35b2-4d66-9797-8661d9b7d47c",
                   "name": "註冊成功",
                   "originalRequest": {
                     "url": {
@@ -95,7 +95,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "c44b5e19-df00-437a-af89-cd2e66a01532",
+                  "id": "4343c3d9-4259-448f-895d-47e0121a2ada",
                   "name": "參數缺失或格式錯誤",
                   "originalRequest": {
                     "url": {
@@ -134,7 +134,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "8cc835a1-01ce-4b75-9ffa-fd80ed320575",
+                  "id": "cb8db6bb-9c8f-4458-88e4-69a740e40582",
                   "name": "Email 已被註冊",
                   "originalRequest": {
                     "url": {
@@ -194,7 +194,7 @@
               }
             },
             {
-              "id": "af0fdc6e-9c00-4198-98bc-9f6400feec08",
+              "id": "838d55db-d1b9-481c-bab6-df3eb9f3cf19",
               "name": "/api/auth/login",
               "request": {
                 "name": "/api/auth/login",
@@ -235,7 +235,7 @@
               },
               "response": [
                 {
-                  "id": "98e85573-b062-4de8-8281-777b2a7a23fe",
+                  "id": "99fa1757-65e6-4a63-b6c3-72e76b9c5df8",
                   "name": "登入成功",
                   "originalRequest": {
                     "url": {
@@ -280,7 +280,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "2e69aaf6-dbc0-4d99-8291-49ff6f3c4f98",
+                  "id": "ee8464e9-d172-4951-a1fc-9421297ae515",
                   "name": "參數缺失",
                   "originalRequest": {
                     "url": {
@@ -319,7 +319,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "7ed55c27-9b9a-47e2-8c27-ad29dc6ca5bc",
+                  "id": "0f0c525e-a19c-4330-b2eb-06a20d1a438e",
                   "name": "Email 或密碼錯誤",
                   "originalRequest": {
                     "url": {
@@ -379,7 +379,7 @@
               }
             },
             {
-              "id": "27597b00-ba83-464e-9d30-be2d3db20f69",
+              "id": "f5f732ab-1c5f-4c1c-bf94-a61f1a0fd9dd",
               "name": "/api/auth/profile",
               "request": {
                 "name": "/api/auth/profile",
@@ -415,7 +415,7 @@
               },
               "response": [
                 {
-                  "id": "db7da1ad-a0b4-4a07-9c95-4d9b9b894394",
+                  "id": "a527aa7b-85ec-46f9-a005-5afc6dcea3cc",
                   "name": "成功",
                   "originalRequest": {
                     "url": {
@@ -460,7 +460,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "ec2c8d04-5f28-49ae-983d-bcdc59621e35",
+                  "id": "78be7283-44a1-4260-802b-5b339e9f3e1b",
                   "name": "未登入或 token 無效",
                   "originalRequest": {
                     "url": {
@@ -510,11 +510,11 @@
           "event": []
         },
         {
-          "id": "43708aed-282e-433f-9beb-f9c643d7e4f5",
+          "id": "e18bb314-3c66-4c0b-9bd3-9c7986668c79",
           "name": "cart",
           "item": [
             {
-              "id": "ad0d01c1-04bd-4a07-9ad2-074ea6815b33",
+              "id": "4fb3b3f4-43c6-4a34-94b4-49e37ca07783",
               "name": "/api/cart",
               "request": {
                 "name": "/api/cart",
@@ -549,7 +549,7 @@
               },
               "response": [
                 {
-                  "id": "ca33b8d2-1a16-4f8b-9425-8ff7b1073a95",
+                  "id": "d7ce25b4-54c7-41cd-9f96-5ac51139f964",
                   "name": "成功",
                   "originalRequest": {
                     "url": {
@@ -588,12 +588,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"quantity\": 2042.9011694144017,\n        \"product\": {\n          \"name\": \"string\",\n          \"price\": 4797.798907263385,\n          \"stock\": 8100.948635862843,\n          \"image_url\": \"string\"\n        }\n      },\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"quantity\": 8269.596919573647,\n        \"product\": {\n          \"name\": \"string\",\n          \"price\": 3876.343204707532,\n          \"stock\": 6548.277087421439,\n          \"image_url\": \"string\"\n        }\n      }\n    ],\n    \"total\": 656.0647635108829\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"quantity\": 7941.449027093058,\n        \"product\": {\n          \"name\": \"string\",\n          \"price\": 4327.167042343186,\n          \"stock\": 6783.612741389511,\n          \"image_url\": \"string\"\n        }\n      },\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"quantity\": 578.4241924910893,\n        \"product\": {\n          \"name\": \"string\",\n          \"price\": 7708.417193242756,\n          \"stock\": 1057.69987963657,\n          \"image_url\": \"string\"\n        }\n      }\n    ],\n    \"total\": 242.5374618040377\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "d9fe7822-6133-47ff-a331-c6d2ee0a724a",
+                  "id": "2b615d88-6dae-4a3f-be06-255d9a9f36b7",
                   "name": "未提供有效的登入 Token 或 X-Session-Id",
                   "originalRequest": {
                     "url": {
@@ -639,7 +639,7 @@
               }
             },
             {
-              "id": "8acaa33d-8dec-4a7c-98a7-03196105a1e6",
+              "id": "c06776ad-9df8-457f-ae66-ce70c3ac483d",
               "name": "/api/cart",
               "request": {
                 "name": "/api/cart",
@@ -687,7 +687,7 @@
               },
               "response": [
                 {
-                  "id": "80876f9c-fc8e-4d6a-936b-1afb906d4a6d",
+                  "id": "a23f1dbc-bac2-413c-a933-1cc696b7a266",
                   "name": "已加入購物車",
                   "originalRequest": {
                     "url": {
@@ -734,12 +734,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"product_id\": \"string\",\n    \"quantity\": 3689.3412286887938\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"product_id\": \"string\",\n    \"quantity\": 5885.744497319957\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "45e73eac-95a9-4991-ac77-0b164ea09fe0",
+                  "id": "5676b139-89dd-44f2-8adc-fe49c66e9193",
                   "name": "參數缺失或庫存不足",
                   "originalRequest": {
                     "url": {
@@ -787,7 +787,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "74d7ba6d-013b-49da-9c16-fc3e3ded1c1f",
+                  "id": "8a788bd1-472b-4ba5-8309-8d62bc2dcd49",
                   "name": "未提供有效的登入 Token 或 X-Session-Id",
                   "originalRequest": {
                     "url": {
@@ -835,7 +835,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "3c685afb-adae-4dfd-ab6b-d1b38f20ae47",
+                  "id": "85d0e7ba-47d2-488d-8d6e-744d77895efe",
                   "name": "商品不存在",
                   "originalRequest": {
                     "url": {
@@ -889,11 +889,11 @@
               }
             },
             {
-              "id": "3d282394-587e-4f73-95e2-31db04cf02e0",
+              "id": "48f55bb5-ee56-4c52-84da-e4b5e8cd58f7",
               "name": "{itemId}",
               "item": [
                 {
-                  "id": "17a1c425-8704-4753-9199-d5627dbbd5e7",
+                  "id": "50898f8c-6c65-4fdd-b807-859205467755",
                   "name": "/api/cart/:itemId",
                   "request": {
                     "name": "/api/cart/:itemId",
@@ -950,7 +950,7 @@
                   },
                   "response": [
                     {
-                      "id": "98ee227b-fc4d-4916-8b75-554f88be6add",
+                      "id": "15f535e8-46d8-4a15-b6f4-48d38be4fb31",
                       "name": "數量已更新",
                       "originalRequest": {
                         "url": {
@@ -1006,12 +1006,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"product_id\": \"string\",\n    \"quantity\": 3689.3412286887938\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"product_id\": \"string\",\n    \"quantity\": 5885.744497319957\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "c7d44bfc-19c1-408d-aca4-08c9318c29e2",
+                      "id": "f7f7bbb2-6b07-4324-b05a-d7fe4bf83119",
                       "name": "庫存不足",
                       "originalRequest": {
                         "url": {
@@ -1068,7 +1068,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "46370411-1ad7-4cc2-a3aa-ff1e763acc8e",
+                      "id": "87e2511f-2790-4b7b-a77d-119b88e81903",
                       "name": "未提供有效的登入 Token 或 X-Session-Id",
                       "originalRequest": {
                         "url": {
@@ -1125,7 +1125,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "6fd206dd-a08d-412f-b348-01a0993e7b2a",
+                      "id": "118f687e-70bc-4e2c-b920-24e78a91b4cd",
                       "name": "購物車項目不存在",
                       "originalRequest": {
                         "url": {
@@ -1188,7 +1188,7 @@
                   }
                 },
                 {
-                  "id": "9fbe3210-f4e5-41b7-8974-9936c6761d44",
+                  "id": "b8a89c6f-bd1c-4a1e-bed6-09a11c3b1704",
                   "name": "/api/cart/:itemId",
                   "request": {
                     "name": "/api/cart/:itemId",
@@ -1232,7 +1232,7 @@
                   },
                   "response": [
                     {
-                      "id": "c7fe4a5b-a16f-409f-82e0-6ca3e92e5ac7",
+                      "id": "a0c7bfea-f9da-48d9-8b23-7e7fedfca21b",
                       "name": "已從購物車移除",
                       "originalRequest": {
                         "url": {
@@ -1285,7 +1285,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "a9cf6ab0-9a6e-44c7-bc24-fd358734cdc3",
+                      "id": "4960e4bc-6637-4fe3-abdf-f801d9cbe667",
                       "name": "未提供有效的登入 Token 或 X-Session-Id",
                       "originalRequest": {
                         "url": {
@@ -1334,7 +1334,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "9a897df7-974d-4092-b5fe-910495ee62cc",
+                      "id": "c8171ac8-d17e-4c20-acab-20cbb88c968e",
                       "name": "購物車項目不存在",
                       "originalRequest": {
                         "url": {
@@ -1395,11 +1395,11 @@
           "event": []
         },
         {
-          "id": "9dde91da-9de7-4a1a-816e-d8f6f14a8d4f",
+          "id": "07684d25-be05-4233-b052-419e39a6db0a",
           "name": "orders",
           "item": [
             {
-              "id": "c842da2d-f368-45fc-8404-bb52d307d639",
+              "id": "aaf35b81-a095-4bef-aaed-1934092b0b4a",
               "name": "/api/orders",
               "request": {
                 "name": "/api/orders",
@@ -1437,7 +1437,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\"\n}",
+                  "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\",\n  \"shippingMethod\": \"<string>\",\n  \"isRemoteArea\": false,\n  \"isRushDelivery\": false\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1447,7 +1447,7 @@
               },
               "response": [
                 {
-                  "id": "bdaf207f-7a89-4532-81aa-9da322d51662",
+                  "id": "4eb5bff7-3490-4726-9faa-09154bf3ac1c",
                   "name": "訂單建立成功",
                   "originalRequest": {
                     "url": {
@@ -1478,7 +1478,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\"\n}",
+                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\",\n  \"shippingMethod\": \"<string>\",\n  \"isRemoteArea\": false,\n  \"isRushDelivery\": false\n}",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -1494,13 +1494,13 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"total_amount\": 4686.574013001211,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 9987.5614851214,\n        \"quantity\": 6713.046786906209\n      },\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 8861.760046824747,\n        \"quantity\": 8418.434121812426\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"subtotal\": 1877.3298636869229,\n    \"shipping_method\": \"string\",\n    \"shipping_fee\": 6706.24890215926,\n    \"is_remote_area\": true,\n    \"is_rush_delivery\": true,\n    \"total_amount\": 3137.9070775168207,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 3005.329579240511,\n        \"quantity\": 9356.095897349769\n      },\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 9259.316751806851,\n        \"quantity\": 5873.267681941431\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "817573db-3d41-4cf2-a953-f274f4bb4a8c",
-                  "name": "購物車為空或庫存不足或收件資訊缺失",
+                  "id": "0dbdb0b6-a1bd-475d-a326-912f05b2a038",
+                  "name": "購物車為空或庫存不足或收件資訊缺失或配送方式無效",
                   "originalRequest": {
                     "url": {
                       "path": [
@@ -1526,7 +1526,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\"\n}",
+                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\",\n  \"shippingMethod\": \"<string>\",\n  \"isRemoteArea\": false,\n  \"isRushDelivery\": false\n}",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -1547,7 +1547,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "557ef27b-f0db-4e56-af4f-2844dd69a9fc",
+                  "id": "7e260fd9-bb58-4eaf-ab3f-f5ac186d0ce1",
                   "name": "未登入或 token 無效",
                   "originalRequest": {
                     "url": {
@@ -1574,7 +1574,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\"\n}",
+                      "raw": "{\n  \"recipientName\": \"<string>\",\n  \"recipientEmail\": \"<email>\",\n  \"recipientAddress\": \"<string>\",\n  \"shippingMethod\": \"<string>\",\n  \"isRemoteArea\": false,\n  \"isRushDelivery\": false\n}",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -1601,7 +1601,7 @@
               }
             },
             {
-              "id": "cef562be-2e64-4eb2-9a3c-dd0d0cc8db6c",
+              "id": "d029e90b-c777-4fb9-aa03-a14be7dd9436",
               "name": "/api/orders",
               "request": {
                 "name": "/api/orders",
@@ -1636,7 +1636,7 @@
               },
               "response": [
                 {
-                  "id": "400581e7-abb9-4f17-a8a4-fff98d6a8950",
+                  "id": "f0faf237-194e-47bc-84a1-a48254839a29",
                   "name": "成功",
                   "originalRequest": {
                     "url": {
@@ -1675,12 +1675,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"orders\": [\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"total_amount\": 7611.447990749143,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"total_amount\": 1612.11013395427,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"orders\": [\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"total_amount\": 7619.85683361929,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"total_amount\": 4956.985425675635,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "828647b2-0828-4a55-a623-64bcebe9e67a",
+                  "id": "825fccca-ac65-488e-9204-e636229112bd",
                   "name": "未登入或 token 無效",
                   "originalRequest": {
                     "url": {
@@ -1726,11 +1726,11 @@
               }
             },
             {
-              "id": "d5768805-8e9c-4f70-b972-26b5ddab06bf",
+              "id": "bf63ddb4-d90b-4e5e-bb48-661c2e1e425a",
               "name": "{id}",
               "item": [
                 {
-                  "id": "1d7d520a-3991-477e-8b38-9b5f267151ba",
+                  "id": "96214a1e-663b-49a0-85ec-96054757cf9e",
                   "name": "/api/orders/:id",
                   "request": {
                     "name": "/api/orders/:id",
@@ -1774,7 +1774,7 @@
                   },
                   "response": [
                     {
-                      "id": "5dbe1603-c23b-4fad-944e-0641b506390e",
+                      "id": "522b9cf3-e50e-42d9-9061-9e5eda8098a3",
                       "name": "成功",
                       "originalRequest": {
                         "url": {
@@ -1822,12 +1822,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"user_id\": \"string\",\n    \"recipient_name\": \"string\",\n    \"recipient_email\": \"string\",\n    \"recipient_address\": \"string\",\n    \"total_amount\": 1862.9282811576643,\n    \"status\": \"string\",\n    \"merchant_trade_no\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"order_id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 7525.790689780291,\n        \"quantity\": 44.73469051094692\n      },\n      {\n        \"id\": \"string\",\n        \"order_id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 2284.8424611812957,\n        \"quantity\": 9206.757034433567\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"user_id\": \"string\",\n    \"recipient_name\": \"string\",\n    \"recipient_email\": \"string\",\n    \"recipient_address\": \"string\",\n    \"subtotal\": 6395.694782339705,\n    \"shipping_method\": \"string\",\n    \"shipping_fee\": 8936.650726182219,\n    \"is_remote_area\": true,\n    \"is_rush_delivery\": true,\n    \"total_amount\": 1357.7319329429415,\n    \"status\": \"string\",\n    \"merchant_trade_no\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"order_id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 2311.4037634222386,\n        \"quantity\": 2762.247751953104\n      },\n      {\n        \"id\": \"string\",\n        \"order_id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 3802.012564188988,\n        \"quantity\": 7007.151926460775\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "b78de075-27da-4f35-a0cb-06898f37931e",
+                      "id": "5794c669-8ff1-4ec7-814b-723b0f912e9d",
                       "name": "未登入或 token 無效",
                       "originalRequest": {
                         "url": {
@@ -1876,7 +1876,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "e98cee25-dab9-434e-8dfc-69b2aa171ba9",
+                      "id": "c3742c05-bbc0-46d6-a118-c8e6ea9a4246",
                       "name": "訂單不存在",
                       "originalRequest": {
                         "url": {
@@ -1931,7 +1931,7 @@
                   }
                 },
                 {
-                  "id": "790a67f4-b8b0-40ac-86a3-5db13f733ee4",
+                  "id": "a6bb4176-9607-4f50-9a74-98efe8777578",
                   "name": "/api/orders/:id/pay",
                   "request": {
                     "name": "/api/orders/:id/pay",
@@ -1989,7 +1989,7 @@
                   },
                   "response": [
                     {
-                      "id": "18e5e47b-0efe-42a0-9130-71a438d2a501",
+                      "id": "575907ee-4d87-4179-8e32-f21665d38bd5",
                       "name": "付款狀態更新成功",
                       "originalRequest": {
                         "url": {
@@ -2046,12 +2046,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"total_amount\": 4686.574013001211,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 9987.5614851214,\n        \"quantity\": 6713.046786906209\n      },\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 8861.760046824747,\n        \"quantity\": 8418.434121812426\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"subtotal\": 1877.3298636869229,\n    \"shipping_method\": \"string\",\n    \"shipping_fee\": 6706.24890215926,\n    \"is_remote_area\": true,\n    \"is_rush_delivery\": true,\n    \"total_amount\": 3137.9070775168207,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 3005.329579240511,\n        \"quantity\": 9356.095897349769\n      },\n      {\n        \"product_name\": \"string\",\n        \"product_price\": 9259.316751806851,\n        \"quantity\": 5873.267681941431\n      }\n    ]\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "5613b9f9-6a38-4d7c-8e55-767e5c6ba7b7",
+                      "id": "7aae044a-0c87-4096-a210-f90301bfc196",
                       "name": "action 無效或訂單狀態不是 pending",
                       "originalRequest": {
                         "url": {
@@ -2109,7 +2109,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "f31a26dc-e059-47db-b971-0b0c220f4dab",
+                      "id": "53fe51e7-a01a-41ae-8f10-d245d076b6a1",
                       "name": "未登入或 token 無效",
                       "originalRequest": {
                         "url": {
@@ -2167,7 +2167,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "8d0472ce-5183-43ff-ad9a-cbb5494be58a",
+                      "id": "0ff815b0-d493-4b15-9400-61336ef55633",
                       "name": "訂單不存在",
                       "originalRequest": {
                         "url": {
@@ -2231,7 +2231,7 @@
                   }
                 },
                 {
-                  "id": "a63c3ab3-8878-4ff2-9aeb-377ec455f0d6",
+                  "id": "73f1e4ff-bfa9-4640-8044-1e1970fff1f3",
                   "name": "/api/orders/:id/check-payment",
                   "request": {
                     "name": "/api/orders/:id/check-payment",
@@ -2270,7 +2270,7 @@
                   },
                   "response": [
                     {
-                      "id": "b5543e41-86c3-460a-9eaa-27559d02ddae",
+                      "id": "1f9d853a-ae01-4842-8cbe-c9cd7a42f5aa",
                       "name": "查詢成功",
                       "originalRequest": {
                         "url": {
@@ -2320,7 +2320,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "23f59219-b457-486c-ba55-df6488fdb78f",
+                      "id": "612961c5-5ba7-4ec0-850d-260c1ff1016f",
                       "name": "訂單狀態不是 pending",
                       "originalRequest": {
                         "url": {
@@ -2370,7 +2370,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "67cff175-cc62-48ba-af57-fe2f4cad0d63",
+                      "id": "d14262c9-2e2c-400c-9546-7a872cb44406",
                       "name": "未登入或 token 無效",
                       "originalRequest": {
                         "url": {
@@ -2420,7 +2420,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "869621f6-34eb-4477-b7dd-46fa5b45cac8",
+                      "id": "8a0eca72-7918-41ce-9679-88b0d67924d0",
                       "name": "訂單不存在",
                       "originalRequest": {
                         "url": {
@@ -2482,11 +2482,11 @@
           "event": []
         },
         {
-          "id": "17998886-8397-4d63-8c99-f3844a23a443",
+          "id": "92e03c5b-d394-4e00-8db3-3695e80af6e6",
           "name": "products",
           "item": [
             {
-              "id": "bbd69656-4bfe-4fa9-bf6a-b6b07597b575",
+              "id": "2464be43-c27e-4d14-bf83-b25bd194fd57",
               "name": "/api/products",
               "request": {
                 "name": "/api/products",
@@ -2524,7 +2524,7 @@
               },
               "response": [
                 {
-                  "id": "34c348a8-da84-4e1f-a1b8-1d6532675303",
+                  "id": "05a010bc-f4a7-4313-b420-24f765c70dff",
                   "name": "成功",
                   "originalRequest": {
                     "url": {
@@ -2564,7 +2564,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"products\": [\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 1167.2549824537682,\n        \"stock\": 404.9102181371089,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 6945.524056316257,\n        \"stock\": 8058.129438008183,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 6821.922428363228,\n      \"page\": 8145.8429449657115,\n      \"limit\": 4201.744648505733,\n      \"totalPages\": 864.0752373848915\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"products\": [\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 7287.782666710796,\n        \"stock\": 2358.3609112614367,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 5041.658469009879,\n        \"stock\": 6381.065531589105,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 5292.858828211785,\n      \"page\": 8964.374657770437,\n      \"limit\": 9234.421659339534,\n      \"totalPages\": 6876.746126386003\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 }
@@ -2575,7 +2575,7 @@
               }
             },
             {
-              "id": "19c1ed6f-8889-456f-8209-747b68b0ad2f",
+              "id": "263cd63e-258b-4c4b-95a5-6448a67965cd",
               "name": "/api/products/:id",
               "request": {
                 "name": "/api/products/:id",
@@ -2611,7 +2611,7 @@
               },
               "response": [
                 {
-                  "id": "e23796bf-84f2-4809-afea-ebd74bad35e9",
+                  "id": "9c1fbe28-630c-4667-9e18-8a5f5693a954",
                   "name": "成功",
                   "originalRequest": {
                     "url": {
@@ -2651,12 +2651,12 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 476.352544634,\n    \"stock\": 8922.123741239944,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                  "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 5207.169137276171,\n    \"stock\": 7807.861000573588,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                   "cookie": [],
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "8b605bad-5e59-4979-b1bc-8cce3a39fb6e",
+                  "id": "a4a84254-d846-4bd6-8545-dba25c9c53a9",
                   "name": "商品不存在",
                   "originalRequest": {
                     "url": {
@@ -2704,15 +2704,15 @@
           "event": []
         },
         {
-          "id": "31e024f5-f885-4421-af83-38f7ef9d6530",
+          "id": "f34b832a-97b8-4fc7-83a5-cb5da5c0b1b4",
           "name": "admin",
           "item": [
             {
-              "id": "437ed917-41d4-43ad-b10d-f6d58bb80628",
+              "id": "5c522a05-fec6-42d4-8067-8f3f349dbcfd",
               "name": "orders",
               "item": [
                 {
-                  "id": "75521cb9-0273-44dc-89f1-1950c6897140",
+                  "id": "6f531ee9-c523-4ccc-9fc8-403a12ee8462",
                   "name": "/api/admin/orders",
                   "request": {
                     "name": "/api/admin/orders",
@@ -2764,7 +2764,7 @@
                   },
                   "response": [
                     {
-                      "id": "f1945ee7-0fca-4c87-ac25-0e9424143eb4",
+                      "id": "f542076a-16f2-43c2-b772-9c4fbfa75ff7",
                       "name": "成功",
                       "originalRequest": {
                         "url": {
@@ -2817,12 +2817,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"orders\": [\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"user_id\": \"string\",\n        \"recipient_name\": \"string\",\n        \"recipient_email\": \"string\",\n        \"total_amount\": 1206.15348094394,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"user_id\": \"string\",\n        \"recipient_name\": \"string\",\n        \"recipient_email\": \"string\",\n        \"total_amount\": 4617.162957997044,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 4011.4940075904346,\n      \"page\": 1455.1699301869169,\n      \"limit\": 649.006957213033,\n      \"totalPages\": 8174.903609826182\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"orders\": [\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"user_id\": \"string\",\n        \"recipient_name\": \"string\",\n        \"recipient_email\": \"string\",\n        \"total_amount\": 3108.5315838752012,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"order_no\": \"string\",\n        \"user_id\": \"string\",\n        \"recipient_name\": \"string\",\n        \"recipient_email\": \"string\",\n        \"total_amount\": 3504.9865765887102,\n        \"status\": \"string\",\n        \"created_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 2259.662596068015,\n      \"page\": 2007.9170171319306,\n      \"limit\": 7125.983992541814,\n      \"totalPages\": 6258.576018275096\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "66b50dfb-2522-433b-b93d-1e311b3efcb2",
+                      "id": "1c93ce83-a409-48e6-b6bc-6353bcb7543d",
                       "name": "未登入",
                       "originalRequest": {
                         "url": {
@@ -2876,7 +2876,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "02254b98-a53e-471f-92e4-b0f75772f915",
+                      "id": "713a024f-e1ad-4426-a501-2439208bac30",
                       "name": "權限不足",
                       "originalRequest": {
                         "url": {
@@ -2936,7 +2936,7 @@
                   }
                 },
                 {
-                  "id": "6a29c5aa-8ce8-420f-8053-10544619cb8d",
+                  "id": "aeb49293-88ec-4b19-9c9e-cfec0f1b409c",
                   "name": "/api/admin/orders/:id",
                   "request": {
                     "name": "/api/admin/orders/:id",
@@ -2981,7 +2981,7 @@
                   },
                   "response": [
                     {
-                      "id": "0f1a9a32-60a3-4f40-adea-3694c9e4ae14",
+                      "id": "fb625cb0-01a0-44fe-a8a8-b99df645a23d",
                       "name": "成功",
                       "originalRequest": {
                         "url": {
@@ -3030,12 +3030,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"user_id\": \"string\",\n    \"recipient_name\": \"string\",\n    \"recipient_email\": \"string\",\n    \"recipient_address\": \"string\",\n    \"total_amount\": 5321.301484445335,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 7639.07706301445,\n        \"quantity\": 6811.883794567042\n      },\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 7120.547007236229,\n        \"quantity\": 5647.949072067666\n      }\n    ],\n    \"user\": {\n      \"name\": \"string\",\n      \"email\": \"string\"\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"order_no\": \"string\",\n    \"user_id\": \"string\",\n    \"recipient_name\": \"string\",\n    \"recipient_email\": \"string\",\n    \"recipient_address\": \"string\",\n    \"total_amount\": 4837.783831803664,\n    \"status\": \"string\",\n    \"created_at\": \"string\",\n    \"items\": [\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 6774.285307722234,\n        \"quantity\": 3187.742063045994\n      },\n      {\n        \"id\": \"string\",\n        \"product_id\": \"string\",\n        \"product_name\": \"string\",\n        \"product_price\": 7409.904943564527,\n        \"quantity\": 654.7788476774041\n      }\n    ],\n    \"user\": {\n      \"name\": \"string\",\n      \"email\": \"string\"\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "7e7a3116-7ea9-408a-a361-d2d4e91bda85",
+                      "id": "2952cff5-75b8-4929-86f3-4d9c36738bb8",
                       "name": "未登入",
                       "originalRequest": {
                         "url": {
@@ -3085,7 +3085,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "789d440a-db53-4714-9f5e-dc700c723fae",
+                      "id": "675096d0-ec4f-44db-98b0-decbdf152944",
                       "name": "權限不足",
                       "originalRequest": {
                         "url": {
@@ -3135,7 +3135,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "7f009f2b-f9dc-4a47-891c-259f95285dad",
+                      "id": "3d92acf5-c52f-40d9-95cc-3b3726eb44ce",
                       "name": "訂單不存在",
                       "originalRequest": {
                         "url": {
@@ -3194,11 +3194,11 @@
               "event": []
             },
             {
-              "id": "5e2a9a4c-8598-4dd4-9d78-b132e93b2dfb",
+              "id": "fdb7324f-561c-48c1-b9fa-a938a6552b51",
               "name": "products",
               "item": [
                 {
-                  "id": "f1a10e77-b91d-43b3-9e12-c402181e5c3c",
+                  "id": "518e1efd-9a2e-428d-9b1e-3fb68fcd8030",
                   "name": "/api/admin/products",
                   "request": {
                     "name": "/api/admin/products",
@@ -3245,7 +3245,7 @@
                   },
                   "response": [
                     {
-                      "id": "388056ea-6ef2-4044-9a5f-0ee66cc322d1",
+                      "id": "b3601880-0d79-412b-b2af-dd609c9dea95",
                       "name": "成功",
                       "originalRequest": {
                         "url": {
@@ -3294,12 +3294,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"products\": [\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 1167.2549824537682,\n        \"stock\": 404.9102181371089,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 6945.524056316257,\n        \"stock\": 8058.129438008183,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 6821.922428363228,\n      \"page\": 8145.8429449657115,\n      \"limit\": 4201.744648505733,\n      \"totalPages\": 864.0752373848915\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"products\": [\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 7287.782666710796,\n        \"stock\": 2358.3609112614367,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      },\n      {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": 5041.658469009879,\n        \"stock\": 6381.065531589105,\n        \"image_url\": \"string\",\n        \"created_at\": \"string\",\n        \"updated_at\": \"string\"\n      }\n    ],\n    \"pagination\": {\n      \"total\": 5292.858828211785,\n      \"page\": 8964.374657770437,\n      \"limit\": 9234.421659339534,\n      \"totalPages\": 6876.746126386003\n    }\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "b4255cf6-118f-4a8c-b3c8-6b198c531d0f",
+                      "id": "ca4abd5d-bea9-4689-ac8a-d501931e620f",
                       "name": "未登入",
                       "originalRequest": {
                         "url": {
@@ -3349,7 +3349,7 @@
                       "_postman_previewlanguage": "text"
                     },
                     {
-                      "id": "bbde20a5-786b-4de3-9456-0029cfa4bb7f",
+                      "id": "c5f7e3e3-52a1-48b8-8a38-c437e832d51b",
                       "name": "權限不足",
                       "originalRequest": {
                         "url": {
@@ -3405,7 +3405,7 @@
                   }
                 },
                 {
-                  "id": "b2ca7c3b-b54e-4042-b6a6-d0eca182747a",
+                  "id": "a25965dd-ecdc-4e72-85a6-c58cbb50ad83",
                   "name": "/api/admin/products",
                   "request": {
                     "name": "/api/admin/products",
@@ -3454,7 +3454,7 @@
                   },
                   "response": [
                     {
-                      "id": "3567dadd-6173-475c-b351-dc1713388a6b",
+                      "id": "3ddc93c4-6dc3-468f-85a0-582f6d9b8039",
                       "name": "商品新增成功",
                       "originalRequest": {
                         "url": {
@@ -3502,12 +3502,12 @@
                           "value": "application/json"
                         }
                       ],
-                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 476.352544634,\n    \"stock\": 8922.123741239944,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                      "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 5207.169137276171,\n    \"stock\": 7807.861000573588,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                       "cookie": [],
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "11ace582-08e1-473f-959d-46491f821a1d",
+                      "id": "cc6c1cf0-e7a1-4f7f-a0dd-438ca50d3b29",
                       "name": "參數錯誤",
                       "originalRequest": {
                         "url": {
@@ -3562,11 +3562,11 @@
                   }
                 },
                 {
-                  "id": "81e6b0ce-6f43-40e8-bf9d-b8e4bf5904ce",
+                  "id": "18e7f7c0-e810-4661-9df9-216296c06312",
                   "name": "{id}",
                   "item": [
                     {
-                      "id": "489c8da1-f28a-453b-876d-a544b01ff65b",
+                      "id": "ede48ca5-386b-4ce2-85f6-d58b76737d83",
                       "name": "/api/admin/products/:id",
                       "request": {
                         "name": "/api/admin/products/:id",
@@ -3624,7 +3624,7 @@
                       },
                       "response": [
                         {
-                          "id": "fff954c0-8c78-454a-86f0-e3679ab600b3",
+                          "id": "22dfadd5-ad3c-4911-9ef4-ab34ec0155a4",
                           "name": "商品更新成功",
                           "originalRequest": {
                             "url": {
@@ -3681,12 +3681,12 @@
                               "value": "application/json"
                             }
                           ],
-                          "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 476.352544634,\n    \"stock\": 8922.123741239944,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
+                          "body": "{\n  \"data\": {\n    \"id\": \"string\",\n    \"name\": \"string\",\n    \"description\": \"string\",\n    \"price\": 5207.169137276171,\n    \"stock\": 7807.861000573588,\n    \"image_url\": \"string\",\n    \"created_at\": \"string\",\n    \"updated_at\": \"string\"\n  },\n  \"error\": \"string\",\n  \"message\": \"string\"\n}",
                           "cookie": [],
                           "_postman_previewlanguage": "json"
                         },
                         {
-                          "id": "4c80e346-2fa2-4244-a2a9-9e4481c048eb",
+                          "id": "dd3b52ab-89fb-482f-8994-937588f458a8",
                           "name": "參數錯誤",
                           "originalRequest": {
                             "url": {
@@ -3744,7 +3744,7 @@
                           "_postman_previewlanguage": "text"
                         },
                         {
-                          "id": "5c3edb12-8bce-40b5-b973-2759055604ba",
+                          "id": "9ed20736-95d8-4680-9a16-45e211b52cec",
                           "name": "商品不存在",
                           "originalRequest": {
                             "url": {
@@ -3808,7 +3808,7 @@
                       }
                     },
                     {
-                      "id": "4d4841d2-7893-4e8c-ba66-8acfa05bb080",
+                      "id": "490747d9-cb53-475d-98a6-bd95ba1c69b7",
                       "name": "/api/admin/products/:id",
                       "request": {
                         "name": "/api/admin/products/:id",
@@ -3853,7 +3853,7 @@
                       },
                       "response": [
                         {
-                          "id": "0d91bb48-ffd9-40a9-979d-6659a6ed00f5",
+                          "id": "5bf3a267-e1e4-44a6-89c6-93f2884ee20c",
                           "name": "商品刪除成功",
                           "originalRequest": {
                             "url": {
@@ -3907,7 +3907,7 @@
                           "_postman_previewlanguage": "json"
                         },
                         {
-                          "id": "101be820-edbb-4fb4-8797-44358478f0da",
+                          "id": "9150100f-2986-45d2-881a-03aec52c8a9d",
                           "name": "商品不存在",
                           "originalRequest": {
                             "url": {
@@ -3957,7 +3957,7 @@
                           "_postman_previewlanguage": "text"
                         },
                         {
-                          "id": "4885058e-795a-4d7c-bc88-db4937d41c95",
+                          "id": "a8a8dcb7-ce25-4b60-a625-efb0bb662e68",
                           "name": "商品存在未完成訂單，無法刪除",
                           "originalRequest": {
                             "url": {
@@ -4034,7 +4034,7 @@
     }
   ],
   "info": {
-    "_postman_id": "d868f5c3-dbc2-45ee-97a0-5aa21549c2ea",
+    "_postman_id": "f53c2c9b-d9a6-4f71-a328-cef7f744e8a0",
     "name": "E-Commerce Demo API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": {

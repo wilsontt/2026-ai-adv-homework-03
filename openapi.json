@@ -685,12 +685,28 @@
                   "recipientAddress": {
                     "type": "string",
                     "minLength": 1
+                  },
+                  "shippingMethod": {
+                    "type": "string",
+                    "enum": [
+                      "home_delivery",
+                      "convenience_store"
+                    ]
+                  },
+                  "isRemoteArea": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "isRushDelivery": {
+                    "type": "boolean",
+                    "default": false
                   }
                 },
                 "required": [
                   "recipientName",
                   "recipientEmail",
-                  "recipientAddress"
+                  "recipientAddress",
+                  "shippingMethod"
                 ]
               }
             }
@@ -712,6 +728,21 @@
                         },
                         "order_no": {
                           "type": "string"
+                        },
+                        "subtotal": {
+                          "type": "number"
+                        },
+                        "shipping_method": {
+                          "type": "string"
+                        },
+                        "shipping_fee": {
+                          "type": "number"
+                        },
+                        "is_remote_area": {
+                          "type": "boolean"
+                        },
+                        "is_rush_delivery": {
+                          "type": "boolean"
                         },
                         "total_amount": {
                           "type": "number"
@@ -748,6 +779,11 @@
                       "required": [
                         "id",
                         "order_no",
+                        "subtotal",
+                        "shipping_method",
+                        "shipping_fee",
+                        "is_remote_area",
+                        "is_rush_delivery",
                         "total_amount",
                         "status",
                         "created_at",
@@ -772,7 +808,7 @@
             }
           },
           "400": {
-            "description": "購物車為空或庫存不足或收件資訊缺失"
+            "description": "購物車為空或庫存不足或收件資訊缺失或配送方式無效"
           },
           "401": {
             "description": "未登入或 token 無效"
@@ -906,6 +942,21 @@
                         "recipient_address": {
                           "type": "string"
                         },
+                        "subtotal": {
+                          "type": "number"
+                        },
+                        "shipping_method": {
+                          "type": "string"
+                        },
+                        "shipping_fee": {
+                          "type": "number"
+                        },
+                        "is_remote_area": {
+                          "type": "boolean"
+                        },
+                        "is_rush_delivery": {
+                          "type": "boolean"
+                        },
                         "total_amount": {
                           "type": "number"
                         },
@@ -961,6 +1012,11 @@
                         "recipient_name",
                         "recipient_email",
                         "recipient_address",
+                        "subtotal",
+                        "shipping_method",
+                        "shipping_fee",
+                        "is_remote_area",
+                        "is_rush_delivery",
                         "total_amount",
                         "status",
                         "merchant_trade_no",
@@ -1052,6 +1108,21 @@
                         "order_no": {
                           "type": "string"
                         },
+                        "subtotal": {
+                          "type": "number"
+                        },
+                        "shipping_method": {
+                          "type": "string"
+                        },
+                        "shipping_fee": {
+                          "type": "number"
+                        },
+                        "is_remote_area": {
+                          "type": "boolean"
+                        },
+                        "is_rush_delivery": {
+                          "type": "boolean"
+                        },
                         "total_amount": {
                           "type": "number"
                         },
@@ -1087,6 +1158,11 @@
                       "required": [
                         "id",
                         "order_no",
+                        "subtotal",
+                        "shipping_method",
+                        "shipping_fee",
+                        "is_remote_area",
+                        "is_rush_delivery",
                         "total_amount",
                         "status",
                         "created_at",
