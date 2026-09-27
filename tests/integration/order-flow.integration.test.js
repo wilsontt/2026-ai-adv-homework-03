@@ -4,6 +4,10 @@ const db = require('../../src/database');
 describe('Order creation flow (integration, in-memory DB)', () => {
   it('confirms this suite runs against an isolated in-memory database', () => {
     expect(process.env.DATABASE_PATH).toBe(':memory:');
+    // 不只檢查環境變數有沒有被注入，直接斷言 better-sqlite3 連線本身確實是記憶體資料庫，
+    // 避免 src/database.js 日後改寫成忽略 DATABASE_PATH 時，這個測試卻矇混過關
+    expect(db.memory).toBe(true);
+    expect(db.name).toBe(':memory:');
   });
 
   it('completes the full flow: register -> get products -> add to cart -> create order, with correct DB writes', async () => {

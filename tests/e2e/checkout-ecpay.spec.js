@@ -11,7 +11,15 @@ test('full checkout flow: login -> add to cart -> checkout -> ECPay payment -> p
   await page.waitForURL('**/');
 
   // 2. 選擇商品並加入購物車
-  await page.getByTestId('add-to-cart').first().click();
+  // 商品列表依 created_at DESC 排序，若只取 .first() 會選到主測試套件（npm test）
+  // 殘留、庫存持續遞減的測試商品，多次執行後可能售完導致按鈕停用、測試逾時失敗。
+  // 改用固定的種子商品名稱（繽紛向日葵花束，種子庫存 40）鎖定卡片，確保穩定可重複執行。
+  const productCard = page
+    .locator('div.bg-white')
+    .filter({ has: page.getByTestId('add-to-cart') })
+    .filter({ hasText: '繽紛向日葵花束' })
+    .first();
+  await productCard.getByTestId('add-to-cart').click();
 
   // 3. 進入結帳頁面
   await page.goto('/checkout');
