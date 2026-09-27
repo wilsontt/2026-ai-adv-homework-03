@@ -3,7 +3,7 @@
 ## 目錄結構
 
 ```
-├── app.js                          # Express 應用設定：view engine、靜態檔案、middleware 串接、路由掛載、404/錯誤處理
+├── app.js                          # Express 應用設定：view engine、靜態檔案、middleware 串接、路由掛載、GET /openapi.json、Swagger UI（/api-docs）、404/錯誤處理
 ├── server.js                       # 伺服器啟動入口，監聽 PORT（預設 3001）
 ├── package.json                    # 專案設定與 npm scripts
 ├── vitest.config.js                # Vitest 測試設定（循序執行、檔案順序）
@@ -18,7 +18,20 @@
 │   │   ├── authMiddleware.js       # JWT 驗證：解析 Bearer token → jwt.verify → 查 DB 確認用戶存在 → 設定 req.user
 │   │   ├── adminMiddleware.js      # 管理員權限檢查：req.user.role === 'admin'，否則 403
 │   │   ├── sessionMiddleware.js    # 提取 X-Session-Id header → 設定 req.sessionId（訪客購物車用）
-│   │   └── errorHandler.js         # 全域錯誤處理：安全訊息對照表，500 一律回「伺服器內部錯誤」
+│   │   ├── errorHandler.js         # 全域錯誤處理：安全訊息對照表，500 一律回「伺服器內部錯誤」
+│   │   └── validate.js             # 通用 Zod validate(schema) middleware：驗證 { body, query, params }，失敗回 400 VALIDATION_ERROR
+│   ├── schemas/
+│   │   ├── common.schema.js        # 共用分頁 schema（pageQuerySchema/limitQuerySchema/paginationSchema）與 errorEnvelope
+│   │   ├── auth.schema.js          # Auth 路由的 Zod schema
+│   │   ├── cart.schema.js          # Cart 路由的 Zod schema
+│   │   ├── order.schema.js         # Order 路由的 Zod schema
+│   │   ├── product.schema.js       # Product 路由的 Zod schema
+│   │   ├── adminOrder.schema.js    # Admin Order 路由的 Zod schema
+│   │   └── adminProduct.schema.js  # Admin Product 路由的 Zod schema
+│   ├── openapi/
+│   │   ├── registry.js             # OpenAPIRegistry 實例，註冊 bearerAuth / sessionAuth securitySchemes
+│   │   ├── generator.js            # 彙整 registry + 六個 paths 檔 → OpenApiGeneratorV3 → OpenAPI document
+│   │   └── paths/                  # 各模組 registry.registerPath()，只依賴 schemas，不 require 路由或 database.js
 │   ├── utils/
 │   │   └── ecpay.js                # 綠界 ECPay 工具：CheckMacValue 簽章、URL 編碼、AIO 表單產生、QueryTradeInfo 查詢
 │   └── routes/

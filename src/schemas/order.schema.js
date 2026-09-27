@@ -7,7 +7,7 @@ const createOrderBodySchema = z.object({
 });
 
 const payOrderBodySchema = z.object({
-  action: z.enum(['success', 'fail'], { errorMap: () => ({ message: 'action 必須為 success 或 fail' }) })
+  action: z.enum(['success', 'fail'], { error: 'action 必須為 success 或 fail' })
 });
 
 const orderIdParamsSchema = z.object({ id: z.string().min(1) });

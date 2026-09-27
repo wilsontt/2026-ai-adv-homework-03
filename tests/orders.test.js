@@ -132,7 +132,7 @@ describe('Orders API', () => {
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
   });
 
-  it('should fail to pay with an invalid action value', async () => {
+  it('should fail to pay with an invalid action value, using the custom Chinese message', async () => {
     const res = await request(app)
       .patch(`/api/orders/${orderId}/pay`)
       .set('Authorization', `Bearer ${userToken}`)
@@ -140,5 +140,6 @@ describe('Orders API', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+    expect(res.body.message).toContain('action 必須為 success 或 fail');
   });
 });

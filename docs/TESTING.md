@@ -52,6 +52,12 @@ export default defineConfig({
 | `tests/orders.test.js` | 建立訂單、空購物車、認證要求、訂單列表、詳情、付款 | 依賴購物車有品項 |
 | `tests/adminProducts.test.js` | 後台商品列表、新增、更新、刪除、權限檢查 | 依賴 admin 帳號 |
 | `tests/adminOrders.test.js` | 後台訂單列表、詳情、狀態篩選 | 依賴訂單存在 + admin 帳號 |
+| `tests/schemas.common.test.js` | 共用分頁 normalize 函式、errorEnvelope、registry securitySchemes | 無（純函式測試，不依賴共用 DB 狀態） |
+| `tests/middleware.validate.test.js` | `validate(schema)` middleware 成功/失敗兩種路徑 | 無（純函式測試） |
+| `tests/openapi.generator.test.js` | `generateDocument()` 產出通過 swagger-parser 驗證、涵蓋六個模組 tags | 無（純函式測試） |
+| `tests/openapi.test.js` | `GET /openapi.json`、`GET /api-docs/` 端點 | 無（不依賴共用 DB 狀態） |
+
+以上 4 個新增測試檔為純函式／端點測試，不依賴 `tests/auth.test.js` 等既有測試建立的共用 DB 狀態，因此未加入 `vitest.config.js` 的 `sequence.files` 順序清單。
 
 ## 執行順序與依賴關係
 

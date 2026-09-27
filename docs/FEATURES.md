@@ -13,7 +13,7 @@
 | 後台訂單管理 | ✅ 完成 | 訂單查詢與狀態篩選 |
 | 前台頁面 | ✅ 完成 | EJS + Tailwind CSS |
 | 後台頁面 | ✅ 完成 | EJS + Tailwind CSS |
-| 測試 | ✅ 完成 | Vitest + supertest，6 個測試檔案 |
+| 測試 | ✅ 完成 | Vitest + supertest，10 個測試檔案 |
 | API 文件 | ✅ 完成 | Zod + zod-to-openapi 生成 OpenAPI，Swagger UI（/api-docs） |
 
 ---

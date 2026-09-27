@@ -1,7 +1,7 @@
 const { z } = require('zod');
 
 const quantitySchema = z.coerce
-  .number({ invalid_type_error: 'quantity 必須為正整數' })
+  .number({ error: 'quantity 必須為正整數' })
   .int('quantity 必須為正整數')
   .positive('quantity 必須為正整數');
 

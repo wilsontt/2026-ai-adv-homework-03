@@ -105,7 +105,7 @@ describe('Cart API', () => {
     expect(res.status).toBe(401);
   });
 
-  it('should fail to add to cart with a non-numeric quantity', async () => {
+  it('should fail to add to cart with a non-numeric quantity, using the custom Chinese message', async () => {
     const res = await request(app)
       .post('/api/cart')
       .set('X-Session-Id', sessionId)
@@ -113,6 +113,7 @@ describe('Cart API', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+    expect(res.body.message).toContain('quantity 必須為正整數');
   });
 
   it('should fail to update cart item quantity to zero', async () => {

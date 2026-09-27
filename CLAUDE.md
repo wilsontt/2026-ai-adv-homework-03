@@ -10,7 +10,7 @@ npm run dev:server     # 僅啟動伺服器（不編譯 CSS）
 npm run dev:css        # Tailwind CSS watch 模式
 npm run css:build      # 編譯並壓縮 CSS
 npm run test           # 執行測試（vitest run，循序執行）
-npm run openapi        # 從 JSDoc 生成 openapi.json
+npm run openapi        # 由 Zod schema 經 zod-to-openapi 產生並以 swagger-parser 驗證後寫入 openapi.json
 ```
 
 ## 關鍵規則

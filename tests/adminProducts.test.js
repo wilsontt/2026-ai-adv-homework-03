@@ -89,6 +89,17 @@ describe('Admin Products API', () => {
     expect(res.body.data.name).toBe('更新後的花卉商品');
   });
 
+  it('should allow updating description/image_url to null (legacy nullable DB columns)', async () => {
+    const res = await request(app)
+      .put(`/api/admin/products/${createdProductId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ description: null, image_url: null });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.description).toBeNull();
+    expect(res.body.data.image_url).toBeNull();
+  });
+
   it('should delete a product', async () => {
     const res = await request(app)
       .delete(`/api/admin/products/${createdProductId}`)
