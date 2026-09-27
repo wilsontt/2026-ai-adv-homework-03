@@ -46,3 +46,6 @@ qa.md
 /test-results/
 /playwright-report/
 /tests/e2e/screenshots/
+
+# Postman collection（由 npm run postman 自動產生，environment.json 為手寫設定則保留版控）
+postman/collection.json
