@@ -141,4 +141,44 @@ describe('Cart API', () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
   });
+
+  it('should fail to add to cart with a negative quantity', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: -3 });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to add to cart with a boolean quantity (must not coerce true to 1)', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: true });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to add to cart with a scientific-notation quantity string (must not coerce "1e2" to 100)', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: '1e2' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should accept a plain digit-string quantity', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: '3' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.quantity).toBeGreaterThanOrEqual(3);
+  });
 });

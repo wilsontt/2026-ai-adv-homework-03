@@ -1,9 +1,11 @@
 const { z } = require('zod');
 
-const quantitySchema = z.coerce
-  .number({ error: 'quantity 必須為正整數' })
-  .int('quantity 必須為正整數')
-  .positive('quantity 必須為正整數');
+const quantitySchema = z.union([
+  z.number(),
+  z.string().regex(/^\d+$/).transform(Number)
+], { error: 'quantity 必須為正整數' }).pipe(
+  z.number().int('quantity 必須為正整數').positive('quantity 必須為正整數')
+);
 
 const addCartBodySchema = z.object({
   productId: z.string().min(1, 'productId 為必填欄位'),
