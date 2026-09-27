@@ -111,4 +111,34 @@ describe('Orders API', () => {
     expect(res.body).toHaveProperty('data', null);
     expect(res.body).toHaveProperty('error');
   });
+
+  it('should fail to create order with missing recipient fields', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ recipientName: '測試' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to create order with an invalid recipient email', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ recipientName: '測試', recipientEmail: 'not-an-email', recipientAddress: '台北市' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to pay with an invalid action value', async () => {
+    const res = await request(app)
+      .patch(`/api/orders/${orderId}/pay`)
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ action: 'not-a-valid-action' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
 });
