@@ -75,6 +75,28 @@ function initializeDatabase() {
     // Column already exists, ignore
   }
 
+  // Migration: add shipping fields for shipping fee module
+  try {
+    db.exec(`ALTER TABLE orders ADD COLUMN shipping_method TEXT`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
+  try {
+    db.exec(`ALTER TABLE orders ADD COLUMN shipping_fee INTEGER`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
+  try {
+    db.exec(`ALTER TABLE orders ADD COLUMN is_remote_area INTEGER`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
+  try {
+    db.exec(`ALTER TABLE orders ADD COLUMN is_rush_delivery INTEGER`);
+  } catch (e) {
+    // Column already exists, ignore
+  }
+
   // Seed data
   seedAdminUser();
   seedProducts();
