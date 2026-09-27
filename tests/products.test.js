@@ -47,4 +47,27 @@ describe('Products API', () => {
     expect(res.body).toHaveProperty('error');
     expect(res.body.error).not.toBeNull();
   });
+
+  it('should clamp negative or zero page/limit to defaults, like the legacy Math.max/Math.min logic', async () => {
+    const res = await request(app).get('/api/products?page=-5&limit=0');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.pagination.page).toBe(1);
+    expect(res.body.data.pagination.limit).toBe(10);
+  });
+
+  it('should clamp limit above 100 down to 100', async () => {
+    const res = await request(app).get('/api/products?limit=500');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.pagination.limit).toBe(100);
+  });
+
+  it('should fall back to defaults for non-numeric page/limit', async () => {
+    const res = await request(app).get('/api/products?page=abc&limit=xyz');
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.pagination.page).toBe(1);
+    expect(res.body.data.pagination.limit).toBe(10);
+  });
 });
