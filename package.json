@@ -9,6 +9,7 @@
     "css:build": "npx @tailwindcss/cli -i public/css/input.css -o public/css/output.css --minify",
     "openapi": "node generate-openapi.js",
     "postman": "node generate-postman.js",
+    "test:unit": "vitest run tests/shipping.test.js",
     "test": "vitest run"
   },
   "dependencies": {
