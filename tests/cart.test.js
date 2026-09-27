@@ -96,4 +96,48 @@ describe('Cart API', () => {
     expect(res.body).toHaveProperty('error');
     expect(res.body.error).not.toBeNull();
   });
+
+  it('should return 401 (not 400) when dualAuth fails even with an invalid body', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .send({});
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should fail to add to cart with a non-numeric quantity', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: 'abc' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to update cart item quantity to zero', async () => {
+    const addRes = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: 1 });
+    const itemId = addRes.body.data.id;
+
+    const res = await request(app)
+      .patch(`/api/cart/${itemId}`)
+      .set('X-Session-Id', sessionId)
+      .send({ quantity: 0 });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to add to cart with a decimal quantity', async () => {
+    const res = await request(app)
+      .post('/api/cart')
+      .set('X-Session-Id', sessionId)
+      .send({ productId, quantity: 1.5 });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
 });
