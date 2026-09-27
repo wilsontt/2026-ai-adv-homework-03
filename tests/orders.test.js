@@ -142,4 +142,33 @@ describe('Orders API', () => {
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
     expect(res.body.message).toContain('action 必須為 success 或 fail');
   });
+
+  it('should fail to create order with a missing shippingMethod', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        recipientName: '測試收件人',
+        recipientEmail: 'recipient@example.com',
+        recipientAddress: '台北市測試路 123 號'
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should fail to create order with an invalid shippingMethod', async () => {
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({
+        recipientName: '測試收件人',
+        recipientEmail: 'recipient@example.com',
+        recipientAddress: '台北市測試路 123 號',
+        shippingMethod: 'drone'
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
 });

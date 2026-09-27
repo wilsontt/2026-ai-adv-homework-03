@@ -1,9 +1,15 @@
 const { z } = require('zod');
+const { SHIPPING_METHODS } = require('../utils/shipping');
+
+const SHIPPING_METHOD_VALUES = Object.keys(SHIPPING_METHODS);
 
 const createOrderBodySchema = z.object({
   recipientName: z.string().min(1, '收件人姓名、Email 和地址為必填欄位'),
   recipientEmail: z.string().min(1, '收件人姓名、Email 和地址為必填欄位').email('Email 格式不正確'),
-  recipientAddress: z.string().min(1, '收件人姓名、Email 和地址為必填欄位')
+  recipientAddress: z.string().min(1, '收件人姓名、Email 和地址為必填欄位'),
+  shippingMethod: z.enum(SHIPPING_METHOD_VALUES, { error: 'shippingMethod 必須為 home_delivery 或 convenience_store' }),
+  isRemoteArea: z.boolean().optional().default(false),
+  isRushDelivery: z.boolean().optional().default(false)
 });
 
 const payOrderBodySchema = z.object({
@@ -36,6 +42,11 @@ const orderItemDetailSchema = z.object({
 const orderRecordSchema = z.object({
   id: z.string(),
   order_no: z.string(),
+  subtotal: z.number(),
+  shipping_method: z.string(),
+  shipping_fee: z.number(),
+  is_remote_area: z.boolean(),
+  is_rush_delivery: z.boolean(),
   total_amount: z.number(),
   status: z.string(),
   created_at: z.string(),
@@ -49,6 +60,11 @@ const orderDetailSchema = z.object({
   recipient_name: z.string(),
   recipient_email: z.string(),
   recipient_address: z.string(),
+  subtotal: z.number(),
+  shipping_method: z.string(),
+  shipping_fee: z.number(),
+  is_remote_area: z.boolean(),
+  is_rush_delivery: z.boolean(),
   total_amount: z.number(),
   status: z.string(),
   merchant_trade_no: z.string().nullable(),
