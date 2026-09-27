@@ -41,3 +41,8 @@ public/css/output.css
 qa.md
 
 1.挑戰新增需求/
+
+# Playwright
+/test-results/
+/playwright-report/
+/tests/e2e/screenshots/
