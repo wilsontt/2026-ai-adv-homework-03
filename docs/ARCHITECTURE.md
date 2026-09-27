@@ -341,7 +341,11 @@ server.js
 | recipient_name | TEXT | NOT NULL | 收件人姓名 |
 | recipient_email | TEXT | NOT NULL | 收件人 Email |
 | recipient_address | TEXT | NOT NULL | 收件地址 |
-| total_amount | INTEGER | NOT NULL | 訂單總金額 |
+| shipping_method | TEXT | 可為 NULL | 配送方式：home_delivery（宅配）或 convenience_store（超商取貨） |
+| shipping_fee | INTEGER | 可為 NULL | 依配送方式、偏遠地區、當日急件、滿額免運規則計算之運費 |
+| is_remote_area | INTEGER | 可為 NULL，0/1 | 是否為偏遠地區（加收 200 元） |
+| is_rush_delivery | INTEGER | 可為 NULL，0/1 | 是否為當日急件（加收 250 元） |
+| total_amount | INTEGER | NOT NULL | 訂單總金額（商品小計 + 運費） |
 | status | TEXT | NOT NULL DEFAULT 'pending', CHECK IN ('pending','paid','failed') | 訂單狀態 |
 | merchant_trade_no | TEXT | 可為 NULL | 綠界交易編號（由 order_no 去除連字號產生，如 `ORD20260412A1B2C`） |
 | created_at | TEXT | NOT NULL DEFAULT datetime('now') | 建立時間 |
@@ -368,10 +372,12 @@ server.js
 ├─ 2. 取得用戶購物車所有品項（JOIN products 取得即時價格與庫存）
 ├─ 3. 檢查購物車是否為空 → 400 CART_EMPTY
 ├─ 4. 檢查每個品項庫存是否充足 → 400 STOCK_INSUFFICIENT（列出所有不足商品名稱）
-├─ 5. 計算 totalAmount = Σ(price × quantity)
-├─ 6. 生成 orderNo: ORD-YYYYMMDD-{5碼UUID}
+├─ 5. 計算 subtotal = Σ(price × quantity)
+├─ 6. 依 src/utils/shipping.js 計算 shippingFee（配送方式、偏遠地區、當日急件、滿額免運規則）
+├─ 7. totalAmount = subtotal + shippingFee
+├─ 8. 生成 orderNo: ORD-YYYYMMDD-{5碼UUID}
 │
-└─ 7. 🔒 Transaction 開始
+└─ 9. 🔒 Transaction 開始
      ├─ INSERT orders 記錄
      ├─ 對每個購物車品項：
      │   ├─ INSERT order_items（快照 product_name, product_price）
@@ -379,7 +385,7 @@ server.js
      └─ DELETE cart_items WHERE user_id = ?
      🔒 Transaction 結束
 │
-└─ 8. 回傳 201 + 訂單詳情
+└─ 10. 回傳 201 + 訂單詳情
 ```
 
 ## 綠界金流付款流程

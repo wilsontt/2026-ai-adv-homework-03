@@ -11,6 +11,10 @@
 - **行為微調**：購物車 `quantity` 驗證改用 `z.union([z.number(), z.string().regex(/^\d+$/)])`，明確拒絕 boolean（如 `true`）與科學記號字串（如 `"1e2"`），修正原 `z.coerce.number()` 過於寬鬆意外將其轉換為合法數字的問題
 
 ### Added
+- 新增配送費用模組（`src/utils/shipping.js`）：宅配／超商取貨基本運費、偏遠地區與當日急件附加費、商品小計滿 1,500 元免基本運費；整合進 `POST /api/orders`，`total_amount` 語意調整為「商品小計 + 運費」
+- `orders` 表新增 `shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery` 欄位
+- 結帳頁新增配送方式選單與運費即時試算，取代原本未串接後端的假運費 UI；訂單詳情頁新增運費明細顯示
+- 新增 `npm run test:unit`，執行 `tests/shipping.test.js` 純函式單元測試
 - 新增 `npm run postman`（`generate-postman.js` + `src/postman/generator.js`）：由 `openapi.json` 產生 `postman/collection.json`，並為登入／註冊請求自動注入 test script，將回應 token 寫入環境變數 `bearerToken`
 - 新增 `postman/environment.json`：含 `baseUrl`、`adminEmail`、`adminPassword`、`bearerToken` 四個變數，供匯入 Postman 直接測試 API
 - 新增 `GET /openapi.json`（回傳 OpenAPI document）與 `GET /api-docs` Swagger UI 瀏覽頁

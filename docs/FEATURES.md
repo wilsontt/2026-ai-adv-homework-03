@@ -232,6 +232,9 @@
 | recipientName | string | 是 | 非空 |
 | recipientEmail | string | 是 | 符合 email 正則 |
 | recipientAddress | string | 是 | 非空 |
+| shippingMethod | string | 是 | `home_delivery` 或 `convenience_store` |
+| isRemoteArea | boolean | 否，預設 false | 是否為偏遠地區，加收 200 元 |
+| isRushDelivery | boolean | 否，預設 false | 是否為當日急件，加收 250 元 |
 
 **業務邏輯**：
 1. 驗證收件人三個欄位皆存在
@@ -239,10 +242,14 @@
 3. 從 `cart_items JOIN products` 取得購物車品項（僅查 `user_id`，不含 session）
 4. 購物車為空 → 400 CART_EMPTY
 5. 逐品項檢查庫存，不足者收集名稱 → 400「以下商品庫存不足：名稱1, 名稱2」
-6. 計算 `totalAmount = Σ(price × quantity)`
-7. 生成 `orderNo = ORD-YYYYMMDD-{5碼UUID大寫}`
-8. **Transaction**：INSERT order → INSERT order_items（快照名稱+價格） → UPDATE stock → DELETE cart_items
-9. 回傳 201 + 訂單詳情
+6. 計算 `subtotal = Σ(price × quantity)`
+7. 依 `src/utils/shipping.js` 之 `calculateShippingFee()` 計算運費：宅配基本運費 120／超商取貨基本運費 60；偏遠地區加收 200；當日急件加收 250；商品小計 ≥ 1,500 元免除基本運費（附加費不受影響）
+8. `totalAmount = subtotal + shippingFee`
+9. 生成 `orderNo = ORD-YYYYMMDD-{5碼UUID大寫}`
+10. **Transaction**：INSERT order → INSERT order_items（快照名稱+價格） → UPDATE stock → DELETE cart_items
+11. 回傳 201 + 訂單詳情
+
+**回應欄位新增**：`subtotal`（商品小計）、`shipping_method`、`shipping_fee`、`is_remote_area`、`is_rush_delivery`（皆同步反映於 `GET /api/orders/:id`）。
 
 **錯誤情境**：
 
@@ -250,6 +257,7 @@
 |--------|--------|------|
 | 400 | VALIDATION_ERROR | 缺少收件人欄位 |
 | 400 | VALIDATION_ERROR | Email 格式不正確 |
+| 400 | VALIDATION_ERROR | shippingMethod 缺漏或非 home_delivery/convenience_store |
 | 400 | CART_EMPTY | 購物車為空 |
 | 400 | STOCK_INSUFFICIENT | 庫存不足（訊息中列出所有不足商品名稱） |
 
