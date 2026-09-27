@@ -27,6 +27,7 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
   const { recipientName, recipientEmail, recipientAddress } = req.validated.body;
   const userId = req.user.userId;
 
+  // Get cart items with product info
   const cartItems = db.prepare(
     `SELECT ci.id, ci.product_id, ci.quantity,
             p.name as product_name, p.price as product_price, p.stock as product_stock
@@ -39,18 +40,21 @@ router.post('/', validate(createOrderRequestSchema), (req, res) => {
     return res.status(400).json({ data: null, error: 'CART_EMPTY', message: '購物車為空' });
   }
 
+  // Check stock
   const insufficientItems = cartItems.filter(item => item.quantity > item.product_stock);
   if (insufficientItems.length > 0) {
     const names = insufficientItems.map(i => i.product_name).join(', ');
     return res.status(400).json({ data: null, error: 'STOCK_INSUFFICIENT', message: `以下商品庫存不足：${names}` });
   }
 
+  // Calculate total
   const totalAmount = cartItems.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
 
   const orderId = uuidv4();
   const orderNo = generateOrderNo();
   const merchantTradeNo = orderNo.replace(/-/g, '');
 
+  // Transaction: create order, order items, deduct stock, clear cart
   const createOrder = db.transaction(() => {
     db.prepare(
       `INSERT INTO orders (id, order_no, user_id, recipient_name, recipient_email, recipient_address, total_amount, merchant_trade_no)

@@ -13,6 +13,7 @@ const {
 
 const router = express.Router();
 
+// All admin product routes require auth + admin
 router.use(authMiddleware, adminMiddleware);
 
 router.get('/', validate(listAdminProductsRequestSchema), (req, res) => {
@@ -77,6 +78,7 @@ router.delete('/:id', validate(deleteProductRequestSchema), (req, res) => {
     return res.status(404).json({ data: null, error: 'NOT_FOUND', message: '商品不存在' });
   }
 
+  // Check if product is in any pending orders
   const pendingOrderCount = db.prepare(
     `SELECT COUNT(*) as count FROM order_items oi
      JOIN orders o ON oi.order_id = o.id

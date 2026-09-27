@@ -28,6 +28,7 @@ function dualAuth(req, res, next) {
       req.user = { userId: decoded.userId, email: decoded.email, role: decoded.role };
       return next();
     } catch (err) {
+      // If Authorization header is present but token is invalid, return 401 immediately
       return res.status(401).json({ data: null, error: 'UNAUTHORIZED', message: 'Token 無效或已過期' });
     }
   }
@@ -84,6 +85,7 @@ router.post('/', dualAuth, validate(addCartRequestSchema), (req, res) => {
 
   const owner = getOwnerCondition(req);
 
+  // Check if product already in cart
   const existingItem = db.prepare(
     `SELECT * FROM cart_items WHERE product_id = ? AND ${owner.field} = ?`
   ).get(productId, owner.value);
