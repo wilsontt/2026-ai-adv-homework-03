@@ -8,6 +8,7 @@
     "dev:css": "npx @tailwindcss/cli -i public/css/input.css -o public/css/output.css --watch",
     "css:build": "npx @tailwindcss/cli -i public/css/input.css -o public/css/output.css --minify",
     "openapi": "node generate-openapi.js",
+    "postman": "node generate-postman.js",
     "test": "vitest run"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",
+    "openapi-to-postmanv2": "^6.3.3",
     "supertest": "^7.2.2",
     "tailwindcss": "^4.2.2",
     "vitest": "^2.1.9"
