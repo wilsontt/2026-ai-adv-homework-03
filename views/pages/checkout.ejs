@@ -58,6 +58,37 @@
             <span class="text-text-primary">NT$ {{ (item.product.price * item.quantity).toLocaleString() }}</span>
           </div>
         </div>
+        <div class="space-y-3 mb-4 border-t border-gray-100 pt-4">
+          <h3 class="text-sm font-medium text-text-primary">配送方式</h3>
+          <label class="flex items-center justify-between text-sm cursor-pointer">
+            <span>
+              <input type="radio" v-model="form.shippingMethod" value="home_delivery" class="mr-2" />
+              宅配
+            </span>
+            <span class="text-text-secondary">NT$ 120</span>
+          </label>
+          <label class="flex items-center justify-between text-sm cursor-pointer">
+            <span>
+              <input type="radio" v-model="form.shippingMethod" value="convenience_store" class="mr-2" />
+              超商取貨
+            </span>
+            <span class="text-text-secondary">NT$ 60</span>
+          </label>
+          <label class="flex items-center justify-between text-sm cursor-pointer">
+            <span>
+              <input type="checkbox" v-model="form.isRemoteArea" class="mr-2" />
+              偏遠地區
+            </span>
+            <span class="text-text-secondary">+NT$ 200</span>
+          </label>
+          <label class="flex items-center justify-between text-sm cursor-pointer">
+            <span>
+              <input type="checkbox" v-model="form.isRushDelivery" class="mr-2" />
+              當日急件
+            </span>
+            <span class="text-text-secondary">+NT$ 250</span>
+          </label>
+        </div>
         <div class="border-t border-gray-100 pt-3 space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-text-secondary">商品小計</span>
@@ -65,13 +96,13 @@
           </div>
           <div class="flex justify-between">
             <span class="text-text-secondary">運費</span>
-            <span>{{ cartTotal >= 500 ? '免運' : 'NT$ 150' }}</span>
+            <span>{{ shippingFee === 0 ? '免運' : ('NT$ ' + shippingFee.toLocaleString()) }}</span>
           </div>
         </div>
         <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between items-center">
           <span class="font-bold text-text-primary">總計</span>
           <span class="font-bold text-xl text-rose-primary">
-            NT$ {{ (cartTotal + (cartTotal >= 500 ? 0 : 150)).toLocaleString() }}
+            NT$ {{ (cartTotal + shippingFee).toLocaleString() }}
           </span>
         </div>
         <button

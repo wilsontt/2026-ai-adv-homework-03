@@ -7,13 +7,32 @@ createApp({
     const loading = ref(true);
     const submitting = ref(false);
     const cartItems = ref([]);
-    const form = ref({ recipientName: '', recipientEmail: '', recipientAddress: '' });
+    const form = ref({
+      recipientName: '',
+      recipientEmail: '',
+      recipientAddress: '',
+      shippingMethod: 'home_delivery',
+      isRemoteArea: false,
+      isRushDelivery: false
+    });
     const errors = ref({});
+
+    var SHIPPING_METHODS = { home_delivery: 120, convenience_store: 60 };
+    var REMOTE_AREA_SURCHARGE = 200;
+    var RUSH_DELIVERY_SURCHARGE = 250;
+    var FREE_BASE_SHIPPING_THRESHOLD = 1500;
 
     const cartTotal = computed(function () {
       return cartItems.value.reduce(function (sum, item) {
         return sum + item.product.price * item.quantity;
       }, 0);
+    });
+
+    const shippingFee = computed(function () {
+      var baseFee = cartTotal.value >= FREE_BASE_SHIPPING_THRESHOLD ? 0 : SHIPPING_METHODS[form.value.shippingMethod];
+      var remoteFee = form.value.isRemoteArea ? REMOTE_AREA_SURCHARGE : 0;
+      var rushFee = form.value.isRushDelivery ? RUSH_DELIVERY_SURCHARGE : 0;
+      return baseFee + remoteFee + rushFee;
     });
 
     function validate() {
@@ -60,6 +79,6 @@ createApp({
       loading.value = false;
     });
 
-    return { loading, submitting, cartItems, form, errors, cartTotal, submitOrder };
+    return { loading, submitting, cartItems, form, errors, cartTotal, shippingFee, submitOrder };
   }
 }).mount('#app');
