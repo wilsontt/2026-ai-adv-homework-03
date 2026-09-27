@@ -69,6 +69,9 @@ npm run postman
 | `npm run dev:css` | Tailwind CSS watch 模式 |
 | `npm run css:build` | 編譯並壓縮 CSS |
 | `npm run test` | 執行全部測試 |
+| `npm run test:unit` | 執行純函式單元測試（`tests/shipping.test.js`） |
+| `npm run test:integration` | 執行 Integration Test（獨立記憶體資料庫） |
+| `npm run test:e2e` | 執行 Playwright E2E 測試（需先手動 `npm run start`） |
 | `npm run openapi` | 生成 openapi.json |
 | `npm run postman` | 由 openapi.json 生成 postman/collection.json |
 

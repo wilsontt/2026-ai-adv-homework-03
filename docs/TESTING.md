@@ -252,3 +252,15 @@ it('should work with session ID', async () => {
 - 不需要管理埠號衝突
 - 不會觸發 `server.js` 中的 `app.listen()`
 - `database.js` 在 `require('../app')` 時即初始化（建表 + 種子資料）
+
+## Integration Test
+
+`npm run test:integration` 執行 `tests/integration/**` 下的測試，使用 `:memory:` SQLite（透過 `DATABASE_PATH` 環境變數注入），完全不觸碰正式 `database.sqlite`，每次執行皆為全新的空白資料庫。
+
+設定檔為 `vitest.integration.config.js`（與主要測試套件的 `vitest.config.js` 分開，避免互相干擾），涵蓋訂單建立完整流程：註冊 → 取得商品 → 加入購物車 → 建立訂單，並驗證運費計算、庫存扣除、訂單品項快照與購物車清空是否正確，以及購物車為空、庫存不足等失敗情境不會建立部分訂單或誤扣庫存。
+
+## E2E Test
+
+`npm run test:e2e` 使用 Playwright，測試前須先手動執行 `npm run start` 啟動伺服器（測試本身不會自動啟動），對 `http://localhost:3001` 進行真實瀏覽器操作，涵蓋登入、加入購物車、結帳、綠界付款（網路ATM／土地銀行測試環境）到訂單狀態確認為 `paid` 的完整流程。因涉及第三方頁面（綠界／土地銀行測試環境），其 DOM 結構不受本專案控制，未來對方介面異動可能導致測試失效，需視情況更新 `tests/e2e/checkout-ecpay.spec.js` 的選擇器。
+
+測試產出（`test-results/`、`playwright-report/`）不納入版控（見 `.gitignore`），每次執行需要獨立截圖與報告時直接查看本機檔案即可。

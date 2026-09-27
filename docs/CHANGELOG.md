@@ -11,6 +11,9 @@
 - **行為微調**：購物車 `quantity` 驗證改用 `z.union([z.number(), z.string().regex(/^\d+$/)])`，明確拒絕 boolean（如 `true`）與科學記號字串（如 `"1e2"`），修正原 `z.coerce.number()` 過於寬鬆意外將其轉換為合法數字的問題
 
 ### Added
+- 新增 Integration Test（`tests/integration/`，`npm run test:integration`）：獨立記憶體 SQLite，驗證訂單建立完整資料寫入、運費計算、庫存扣除、購物車清空與失敗情境不留髒資料
+- 新增 E2E Test（Playwright，`tests/e2e/`，`npm run test:e2e`）：涵蓋登入到綠界付款成功的完整流程
+- Postman 變數 `bearerToken` 統一改名為 `token`，新增 `sessionId` 變數；`postman/collection.json` 移出版控，改為執行 `npm run postman` 產生
 - 新增配送費用模組（`src/utils/shipping.js`）：宅配／超商取貨基本運費、偏遠地區與當日急件附加費、商品小計滿 1,500 元時**僅宅配**免基本運費（超商取貨仍需支付基本運費）；整合進 `POST /api/orders`，`total_amount` 語意調整為「商品小計 + 運費」
 - `orders` 表新增 `shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery` 欄位
 - 結帳頁新增配送方式選單與運費即時試算，取代原本未串接後端的假運費 UI；訂單詳情頁新增運費明細顯示
