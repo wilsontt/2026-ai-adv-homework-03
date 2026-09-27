@@ -3,8 +3,10 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const sessionMiddleware = require('./src/middleware/sessionMiddleware');
 const errorHandler = require('./src/middleware/errorHandler');
+const { generateDocument } = require('./src/openapi/generator');
 
 // Initialize database (creates tables + seed data)
 require('./src/database');
@@ -33,6 +35,13 @@ app.use('/api/admin/orders', require('./src/routes/adminOrderRoutes'));
 app.use('/api/products', require('./src/routes/productRoutes'));
 app.use('/api/cart', require('./src/routes/cartRoutes'));
 app.use('/api/orders', require('./src/routes/orderRoutes'));
+
+const openapiDocument = generateDocument();
+
+app.get('/openapi.json', (req, res) => {
+  res.json(openapiDocument);
+});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 // Page Routes
 app.use('/', require('./src/routes/pageRoutes'));
