@@ -29,7 +29,8 @@ createApp({
     });
 
     const shippingFee = computed(function () {
-      var baseFee = cartTotal.value >= FREE_BASE_SHIPPING_THRESHOLD ? 0 : SHIPPING_METHODS[form.value.shippingMethod];
+      var qualifiesForFreeBase = form.value.shippingMethod === 'home_delivery' && cartTotal.value >= FREE_BASE_SHIPPING_THRESHOLD;
+      var baseFee = qualifiesForFreeBase ? 0 : SHIPPING_METHODS[form.value.shippingMethod];
       var remoteFee = form.value.isRemoteArea ? REMOTE_AREA_SURCHARGE : 0;
       var rushFee = form.value.isRushDelivery ? RUSH_DELIVERY_SURCHARGE : 0;
       return baseFee + remoteFee + rushFee;

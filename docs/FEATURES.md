@@ -243,7 +243,7 @@
 4. 購物車為空 → 400 CART_EMPTY
 5. 逐品項檢查庫存，不足者收集名稱 → 400「以下商品庫存不足：名稱1, 名稱2」
 6. 計算 `subtotal = Σ(price × quantity)`
-7. 依 `src/utils/shipping.js` 之 `calculateShippingFee()` 計算運費：宅配基本運費 120／超商取貨基本運費 60；偏遠地區加收 200；當日急件加收 250；商品小計 ≥ 1,500 元免除基本運費（附加費不受影響）
+7. 依 `src/utils/shipping.js` 之 `calculateShippingFee()` 計算運費：宅配基本運費 120／超商取貨基本運費 60；偏遠地區加收 200；當日急件加收 250；商品小計 ≥ 1,500 元時**僅宅配**免除基本運費（超商取貨仍需支付基本運費；附加費不受影響）
 8. `totalAmount = subtotal + shippingFee`
 9. 生成 `orderNo = ORD-YYYYMMDD-{5碼UUID大寫}`
 10. **Transaction**：INSERT order → INSERT order_items（快照名稱+價格） → UPDATE stock → DELETE cart_items

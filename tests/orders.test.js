@@ -376,6 +376,33 @@ describe('Orders API', () => {
     expect(res.body.data.total_amount).toBe(1500);
   });
 
+  it('should still charge the convenience_store base fee even when subtotal reaches 1500 (free base shipping is home_delivery only)', async () => {
+    const { token } = await registerUser();
+    const products = await request(app).get('/api/products').then((r) => r.body.data.products);
+    const tulip = products.find((p) => p.price === 750 && p.stock >= 2);
+
+    const addRes = await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ productId: tulip.id, quantity: 2 });
+    expect(addRes.status).toBe(200);
+
+    const res = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        recipientName: '超商滿額測試',
+        recipientEmail: 'store-over-threshold@example.com',
+        recipientAddress: '台北市超商滿額測試路 1 號',
+        shippingMethod: 'convenience_store'
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.subtotal).toBe(1500);
+    expect(res.body.data.shipping_fee).toBe(60);
+    expect(res.body.data.total_amount).toBe(1560);
+  });
+
   it('should still charge the base fee at exactly 1499 subtotal (integration-level boundary)', async () => {
     const adminToken = await getAdminToken();
     const createProductRes = await request(app)

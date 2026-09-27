@@ -20,9 +20,13 @@ describe('calculateShippingFee', () => {
     expect(calculateShippingFee({ shippingMethod: 'convenience_store', subtotal: 1499 })).toBe(60);
   });
 
-  it('商品小計恰為 1,500 元免除基本運費', () => {
+  it('商品小計恰為 1,500 元時，宅配免除基本運費', () => {
     expect(calculateShippingFee({ shippingMethod: 'home_delivery', subtotal: 1500 })).toBe(0);
-    expect(calculateShippingFee({ shippingMethod: 'convenience_store', subtotal: 1500 })).toBe(0);
+  });
+
+  it('商品小計恰為 1,500 元時，超商取貨仍需支付基本運費（滿額免運僅限宅配）', () => {
+    expect(calculateShippingFee({ shippingMethod: 'convenience_store', subtotal: 1500 })).toBe(60);
+    expect(calculateShippingFee({ shippingMethod: 'convenience_store', subtotal: 99999 })).toBe(60);
   });
 
   it('偏遠地區加收 200 元', () => {
