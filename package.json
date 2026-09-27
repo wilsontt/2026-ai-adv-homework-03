@@ -10,6 +10,7 @@
     "openapi": "node generate-openapi.js",
     "postman": "node generate-postman.js",
     "test:unit": "vitest run tests/shipping.test.js",
+    "test:integration": "vitest run --config vitest.integration.config.js",
     "test": "vitest run"
   },
   "dependencies": {
