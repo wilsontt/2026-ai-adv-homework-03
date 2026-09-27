@@ -58,6 +58,37 @@ describe('Admin Products API', () => {
     expect(res.body.data).toHaveProperty('price', 600);
   });
 
+  it('should reject creating a product with a missing price', async () => {
+    const res = await request(app)
+      .post('/api/admin/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: '缺少價格商品', stock: 10 });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should reject updating a product with a whitespace-only name', async () => {
+    const res = await request(app)
+      .put(`/api/admin/products/${createdProductId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: '   ' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
+  it('should allow a partial update without the name field', async () => {
+    const res = await request(app)
+      .put(`/api/admin/products/${createdProductId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ stock: 42 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.stock).toBe(42);
+    expect(res.body.data.name).toBe('更新後的花卉商品');
+  });
+
   it('should delete a product', async () => {
     const res = await request(app)
       .delete(`/api/admin/products/${createdProductId}`)
