@@ -81,4 +81,13 @@ describe('Admin Orders API', () => {
     expect(res.body).toHaveProperty('error');
     expect(res.body.error).not.toBeNull();
   });
+
+  it('should ignore an invalid status filter and return all orders', async () => {
+    const res = await request(app)
+      .get('/api/admin/orders?status=not-a-real-status')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.orders.length).toBeGreaterThan(0);
+  });
 });
