@@ -1,5 +1,6 @@
 const { generateDocument } = require('../src/openapi/generator');
 const SwaggerParser = require('swagger-parser');
+const committedDocument = require('../openapi.json');
 
 describe('OpenAPI generator', () => {
   it('produces a document that passes swagger-parser validation', async () => {
@@ -27,5 +28,10 @@ describe('OpenAPI generator', () => {
     expect(page.required).toBe(false);
     expect(limit.schema).toMatchObject({ type: 'integer', default: 10, minimum: 1, maximum: 100 });
     expect(limit.required).toBe(false);
+  });
+
+  it('matches the committed openapi.json exactly (run `npm run openapi` and commit the result if this fails)', () => {
+    const document = JSON.parse(JSON.stringify(generateDocument()));
+    expect(document).toEqual(committedDocument);
   });
 });

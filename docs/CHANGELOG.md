@@ -7,6 +7,8 @@
 ### Changed
 - API 文件與輸入驗證改用 Zod + `@asteasolutions/zod-to-openapi`：新增 `src/schemas/*.schema.js`、`src/openapi/registry.js`、`src/openapi/paths/*.paths.js`、`src/openapi/generator.js`、`src/middleware/validate.js`，取代 `swagger-jsdoc` 與六個路由檔中手刻的 if 驗證
 - `generate-openapi.js` 產檔前以 `swagger-parser` 驗證規格合法性
+- **行為微調**：`register`／建立訂單等端點的 email 驗證改用 Zod 內建 `.email()`，比舊版正規表示式更嚴格，極少數舊版視為合法的 email 格式（例如特殊字元組合）現在會被拒絕（400 VALIDATION_ERROR）；規格未明文規定 email 驗證的嚴謹程度，此為 Zod 型別檢查取代手刻正規表示式的自然結果，非刻意收緊業務規則
+- **行為微調**：購物車 `quantity` 驗證改用 `z.union([z.number(), z.string().regex(/^\d+$/)])`，明確拒絕 boolean（如 `true`）與科學記號字串（如 `"1e2"`），修正原 `z.coerce.number()` 過於寬鬆意外將其轉換為合法數字的問題
 
 ### Added
 - 新增 `GET /openapi.json`（回傳 OpenAPI document）與 `GET /api-docs` Swagger UI 瀏覽頁

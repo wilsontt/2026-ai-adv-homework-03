@@ -40,4 +40,23 @@ describe('validate middleware', () => {
       expect.objectContaining({ data: null, error: 'VALIDATION_ERROR' })
     );
   });
+
+  it('joins multiple field errors into one "; "-separated message string', () => {
+    const multiFieldSchema = z.object({
+      body: z.object({
+        name: z.string().min(1, 'name 為必填欄位'),
+        age: z.number({ error: 'age 必須為數字' })
+      }),
+      query: z.object({}),
+      params: z.object({})
+    });
+    const req = { body: { name: '', age: 'not-a-number' }, query: {}, params: {} };
+    const res = mockRes();
+    const next = vi.fn();
+
+    validate(multiFieldSchema)(req, res, next);
+
+    const [[payload]] = res.json.mock.calls;
+    expect(payload.message).toBe('name 為必填欄位; age 必須為數字');
+  });
 });

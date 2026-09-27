@@ -78,6 +78,16 @@ describe('Admin Products API', () => {
     expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
   });
 
+  it('should reject updating a product with an empty string name', async () => {
+    const res = await request(app)
+      .put(`/api/admin/products/${createdProductId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+  });
+
   it('should allow a partial update without the name field', async () => {
     const res = await request(app)
       .put(`/api/admin/products/${createdProductId}`)
