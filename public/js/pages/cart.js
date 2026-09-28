@@ -7,10 +7,29 @@ createApp({
     const confirmVisible = ref(false);
     const deleteItemId = ref('');
 
+    var HOME_DELIVERY_BASE_FEE = 120;
+    var FREE_BASE_SHIPPING_THRESHOLD = 1500;
+
     const total = computed(function () {
       return items.value.reduce(function (sum, item) {
         return sum + item.product.price * item.quantity;
       }, 0);
+    });
+
+    const qualifiesForFreeShipping = computed(function () {
+      return total.value >= FREE_BASE_SHIPPING_THRESHOLD;
+    });
+
+    const shippingFee = computed(function () {
+      return qualifiesForFreeShipping.value ? 0 : HOME_DELIVERY_BASE_FEE;
+    });
+
+    const amountToFreeShipping = computed(function () {
+      return FREE_BASE_SHIPPING_THRESHOLD - total.value;
+    });
+
+    const grandTotal = computed(function () {
+      return total.value + shippingFee.value;
     });
 
     async function loadCart() {
@@ -68,7 +87,8 @@ createApp({
     });
 
     return {
-      items, loading, total, confirmVisible,
+      items, loading, total, qualifiesForFreeShipping, shippingFee,
+      amountToFreeShipping, grandTotal, confirmVisible,
       updateQuantity, confirmDelete, handleDelete, goCheckout
     };
   }

@@ -14,11 +14,11 @@
 
   <template v-else>
     <!-- Free shipping banner -->
-    <div v-if="total < 500" class="bg-blush rounded-xl p-3 mb-6 text-sm text-rose-primary text-center">
-      &#127803; 再買 NT$ {{ (500 - total).toLocaleString() }} 即可享免運費！
+    <div v-if="!qualifiesForFreeShipping" class="bg-blush rounded-xl p-3 mb-6 text-sm text-rose-primary text-center">
+      &#127803; 再買 NT$ {{ amountToFreeShipping.toLocaleString() }} 即可享宅配免運！
     </div>
     <div v-else class="bg-sage/10 rounded-xl p-3 mb-6 text-sm text-sage text-center">
-      &#10003; 已達免運門檻！
+      &#10003; 已達宅配免運門檻！
     </div>
 
     <!-- Cart Items -->
@@ -79,13 +79,13 @@
         <span class="text-text-primary">NT$ {{ total.toLocaleString() }}</span>
       </div>
       <div class="flex justify-between items-center mb-4 text-sm">
-        <span class="text-text-secondary">運費</span>
-        <span class="text-text-primary">{{ total >= 500 ? '免運' : 'NT$ 150' }}</span>
+        <span class="text-text-secondary">運費（宅配預覽）</span>
+        <span class="text-text-primary">{{ shippingFee === 0 ? '免運' : ('NT$ ' + shippingFee.toLocaleString()) }}</span>
       </div>
       <div class="border-t border-gray-100 pt-4 flex justify-between items-center">
         <span class="font-bold text-text-primary">總計</span>
         <span class="font-bold text-xl text-rose-primary">
-          NT$ {{ (total + (total >= 500 ? 0 : 150)).toLocaleString() }}
+          NT$ {{ grandTotal.toLocaleString() }}
         </span>
       </div>
       <button

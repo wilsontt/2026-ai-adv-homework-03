@@ -213,7 +213,7 @@ server.js
 |------|------|----------|
 | `/` | 首頁 | pages/index.js |
 | `/products/:id` | 商品詳情 | pages/product-detail.js |
-| `/cart` | 購物車 | pages/cart.js |
+| `/cart` | 購物車（宅配運費預覽：基本運費 120，小計 ≥ 1,500 免運；實際金額於結帳重算） | pages/cart.js |
 | `/checkout` | 結帳 | pages/checkout.js |
 | `/login` | 登入 | pages/login.js |
 | `/orders` | 我的訂單 | pages/orders.js |

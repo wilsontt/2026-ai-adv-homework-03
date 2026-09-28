@@ -9,6 +9,7 @@
 
 ### Fixed
 - 修正商品無圖時的預設圖片網址已失效（404）問題：`index.ejs`／`product-detail.ejs`／`cart.ejs`／`admin/products.ejs`／`public/js/pages/index.js` 五處共用的 Unsplash fallback 圖片已被下架，改用已驗證可用的圖片網址
+- 購物車頁運費預覽由寫死「滿 500 免運／未滿收 150」改為與結帳相同的宅配規則：基本運費 120，商品小計 ≥ 1,500 才免運。首頁與商品詳情的免運文案同步改為 NT$ 1,500 宅配免運
 
 ### Docs
 - 補齊 `docs/ARCHITECTURE.md` 目錄結構（Integration/E2E Test、Playwright、GitHub Actions、Postman generator 等此前未同步的檔案），新增「測試分層與 CI」「Postman Collection 產生」章節
