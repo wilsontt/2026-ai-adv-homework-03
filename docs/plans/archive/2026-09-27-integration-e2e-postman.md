@@ -10,6 +10,37 @@
 
 **Spec:** `docs/plans/2026-09-27-integration-e2e-postman.md`（本檔案下方 User Story / Spec 兩節）
 
+## 執行紀錄（全部完成，2026-09-27）
+
+以 `superpowers:executing-plans` Native 方式逐一執行，每個 Task 的完成證據皆為實際跑過的測試指令與其輸出，並以獨立 commit 落地。以下對照表為完成後回填（原執行過程中的完整 Ruling／發現記錄留存於本機 `.superpowers/sdd/2026-09-27-integration-e2e-postman/progress.md`，該檔為 gitignore 暫存 ledger，不隨版控保留，故關鍵決策已摘錄於此，成為本文件的一部分）：
+
+| Task | 狀態 | Commit | 驗證 |
+|------|------|--------|------|
+| 1. `DATABASE_PATH` 覆寫 | ✅ 完成 | `ebfb616` | `npm test` 12 檔全綠 |
+| 2. Integration Test 設定 | ✅ 完成 | `ff6c478` | `npm run test:integration` 通過 |
+| 3. 訂單建立流程 Integration Test | ✅ 完成 | `0db3d02` | `npm run test:integration` 4/4 通過 |
+| 4. Playwright 安裝與設定 | ✅ 完成 | `c760be2` | `npm run test:e2e` 1/1 通過（smoke） |
+| 5. `data-testid` 補強 | ✅ 完成 | `fcf3c4c` | `npm test` 12 檔全綠 |
+| 6. 真實綠界／土地銀行流程探索 | ✅ 完成（探索性質，依計畫本文無需 commit） | — | 拋棄式腳本實測全流程通過，發現記錄見下 |
+| 7. 正式 E2E Spec | ✅ 完成 | `54ea5c9` | `npm run test:e2e` 1/1 通過，含真實綠界付款成功截圖 |
+| 8. Postman `bearerToken`→`token` 改名 | ✅ 完成 | `23d276e` | `tests/postman.generator.test.js` 5/5 通過 |
+| 9. `postman/collection.json` 移出版控 | ✅ 完成 | `41ba5ea` | `git status` 確認已移除追蹤、本機檔案仍在 |
+| 10. 文件同步與最終驗證 | ✅ 完成 | `b82ff54` | `npm test`/`test:unit`/`test:integration`/`openapi`/`postman` 全數成功 |
+| 最終整體審查（獨立 opus 子代理）與修正 | ✅ 完成 | `89c627f` | 3 項 Important 已修正並以 TDD 驗證，8 項 Minor 列為延後事項（見下） |
+
+**執行過程中的關鍵裁決（Ruling）：**
+- Task 3：brief 原假設「price < 1500」商品乘以數量 2 必低於免運門檻，實際第一個符合商品（白色百合花禮盒 1280）會觸發「小計 ≥1500 時宅配免基本運費」規則，導致運費斷言錯誤。改用結構性條件 `price * 2 < 1500`，不寫死商品名稱。
+- Task 5：`vitest.config.js` 的 exclude 補上 `tests/e2e/**`，修正 Task 2／Task 4 交界處遺漏（Vitest 預設 include 會誤跑 Playwright 的 `.spec.js`）。
+- Task 6（探索）：確認綠界「返回商店」後導回 `/orders/:id?payment=pending`，`order-detail.js` 的 `onMounted` 會依此參數自動觸發付款狀態查詢，Task 7 的 E2E 不需要手動點擊「查詢付款狀態」按鈕。
+- Task 7：brief 骨架讀取 JWT 用的 `localStorage.getItem('token')` 鍵名有誤，實際專案鍵名為 `flower_token`（見 `public/js/auth.js`），已修正。
+
+**最終審查修正（commit `89c627f`）：**
+1. Integration Test 的 in-memory 驗證原本只檢查環境變數是否注入，改為直接斷言 `db.memory`/`db.name`，確保 `DATABASE_PATH` 真的生效。
+2. E2E 加入購物車原本挑選清單第一項，會選到主測試套件殘留、庫存持續遞減的測試商品，長期執行會售完逾時；改用固定種子商品（繽紛向日葵花束）鎖定。
+3. `docs/README.md`／`docs/CHANGELOG.md` 修正仍描述舊版 `bearerToken` 的敘述，統一為 `token`／`sessionId`。
+
+**延後事項（Minor，未修正，供後續維護參考）：** E2E 的 paid 驗證僅依賴單次自動查詢、未做輪詢重試；加入購物車後未等待 API 回應即導頁；Integration Test 庫存不足情境未明確斷言 `order_items` 無新列；`postman/environment.json` 的 `sessionId` 變數目前無請求實際使用；Postman 改名測試覆蓋率可再加強；`vitest.config.js` 的 exclude 覆寫遺失 Vitest 預設排除項；`docs/ARCHITECTURE.md` 與專案 `CLAUDE.md` 尚未同步列出本次新增指令。
+
 ## Global Constraints
 
 - `src/database.js` 的預設路徑與現有生產/測試行為完全不變；`DATABASE_PATH` 環境變數為新增的可選覆寫，未設定時行為與修改前完全一致。
@@ -68,7 +99,7 @@
 **Interfaces:**
 - Produces: `process.env.DATABASE_PATH` 未設定時行為不變；設為 `:memory:` 或任意路徑時，`db` 連線改指向該路徑。Task 2（vitest.integration.config.js）消費此環境變數。
 
-- [ ] **Step 1: 修改 `src/database.js` 第 6 行**
+- [x] **Step 1: 修改 `src/database.js` 第 6 行**
 
 把：
 ```js
@@ -79,7 +110,7 @@ const dbPath = path.join(__dirname, '..', 'database.sqlite');
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.sqlite');
 ```
 
-- [ ] **Step 2: 手動驗證預設行為不變**
+- [x] **Step 2: 手動驗證預設行為不變**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -88,7 +119,7 @@ ls database.sqlite
 ```
 Expected: 印出 `{ c: 8 }`（8 個種子商品），且 `database.sqlite` 檔案確實存在於專案根目錄。
 
-- [ ] **Step 3: 手動驗證 `DATABASE_PATH=:memory:` 時不建立/不影響正式檔案**
+- [x] **Step 3: 手動驗證 `DATABASE_PATH=:memory:` 時不建立/不影響正式檔案**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -97,14 +128,14 @@ ls database.sqlite 2>&1
 ```
 Expected: 印出 `{ c: 8 }`，第二個 `ls` 指令應印出 `No such file or directory`（因為記憶體 DB 不寫入磁碟，且上一步已先刪除該檔案）。
 
-- [ ] **Step 4: 執行既有全套測試確認未破壞**
+- [x] **Step 4: 執行既有全套測試確認未破壞**
 
 ```bash
 npm test
 ```
 Expected: 12 個測試檔全數 PASS（既有行為不變，因為預設值未變動）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/database.js
@@ -129,7 +160,7 @@ EOF
 - Consumes: `DATABASE_PATH`（Task 1）。
 - Produces: `npm run test:integration` 執行 `tests/integration/**/*.test.js`，且該目錄下的檔案不會被 `npm run test`（主設定）重複執行。Task 3 的測試檔即放在此目錄下。
 
-- [ ] **Step 1: 建立 `vitest.integration.config.js`**
+- [x] **Step 1: 建立 `vitest.integration.config.js`**
 
 ```js
 import { defineConfig } from 'vitest/config';
@@ -147,7 +178,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 2: 修改主 `vitest.config.js`，排除 integration 目錄**
+- [x] **Step 2: 修改主 `vitest.config.js`，排除 integration 目錄**
 
 把：
 ```js
@@ -169,14 +200,14 @@ export default defineConfig({
 
 （Vitest 預設 `exclude` 已包含 `node_modules` 等常見目錄，此處明確寫出 `**/node_modules/**` 是為了覆寫預設陣列時不遺漏，避免不小心讓 `node_modules` 底下的套件測試被掃到。）
 
-- [ ] **Step 3: 新增 `package.json` script**
+- [x] **Step 3: 新增 `package.json` script**
 
 在 `"test:unit"` 之後、`"test"` 之前加入：
 ```json
 "test:integration": "vitest run --config vitest.integration.config.js",
 ```
 
-- [ ] **Step 4: 建立佔位測試檔驗證設定正確**
+- [x] **Step 4: 建立佔位測試檔驗證設定正確**
 
 建立 `tests/integration/_setup-check.integration.test.js`（此檔案為本步驟的驗證用途，Task 3 完成後會被正式測試檔取代，若 Task 3 未取代則保留亦不影響其他測試）：
 
@@ -191,21 +222,21 @@ describe('integration test environment', () => {
 });
 ```
 
-- [ ] **Step 5: 執行驗證**
+- [x] **Step 5: 執行驗證**
 
 ```bash
 npm run test:integration
 ```
 Expected: PASS（1 個測試通過）。
 
-- [ ] **Step 6: 確認主測試套件不會重複執行此目錄**
+- [x] **Step 6: 確認主測試套件不會重複執行此目錄**
 
 ```bash
 npm test 2>&1 | grep -c "integration"
 ```
 Expected: 印出 `0`（主 `npm test` 的輸出中完全不出現 `integration` 字樣，代表該目錄未被主設定掃到）。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add vitest.integration.config.js vitest.config.js package.json tests/integration/_setup-check.integration.test.js
@@ -228,7 +259,7 @@ EOF
 **Interfaces:**
 - Consumes: `app`/`request`/`registerUser`/`getAdminToken`（`tests/setup.js`，沿用既有匯出）、`db`（`src/database.js`，記憶體模式）。
 
-- [ ] **Step 1: 刪除佔位測試檔，建立正式測試檔**
+- [x] **Step 1: 刪除佔位測試檔，建立正式測試檔**
 
 ```bash
 rm tests/integration/_setup-check.integration.test.js
@@ -390,21 +421,21 @@ describe('Order creation flow (integration, in-memory DB)', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試**
+- [x] **Step 2: 執行測試**
 
 ```bash
 npm run test:integration
 ```
 Expected: PASS（4 個 it 全數通過：環境確認 1 筆＋完整流程 1 筆＋兩個失敗情境 2 筆）。
 
-- [ ] **Step 3: 確認記憶體 DB 確實未觸碰正式資料庫**
+- [x] **Step 3: 確認記憶體 DB 確實未觸碰正式資料庫**
 
 ```bash
 ls database.sqlite 2>&1
 ```
 Expected: 若先前步驟未執行過會建立正式 DB 的指令，此處應印出 `No such file or directory`（本計畫的所有 Integration Test 相關指令皆不應建立此檔案）；若專案根目錄本來就已存在 `database.sqlite`（例如先前手動啟動過伺服器），改為執行 `npm run test:integration` 前後比較檔案的最後修改時間（`ls -la database.sqlite`）應完全不變。
 
-- [ ] **Step 4: 執行主測試套件確認互不干擾**
+- [x] **Step 4: 執行主測試套件確認互不干擾**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -412,7 +443,7 @@ npm test
 ```
 Expected: 12 個測試檔全數 PASS，與 Integration Test 無關。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tests/integration/order-flow.integration.test.js
@@ -437,14 +468,14 @@ EOF
 **Interfaces:**
 - Produces: `npm run test:e2e` 執行 `tests/e2e/**/*.spec.js`，`baseURL` 為 `http://localhost:3001`，不自動啟動伺服器。Task 6/7 消費此設定。
 
-- [ ] **Step 1: 安裝 Playwright**
+- [x] **Step 1: 安裝 Playwright**
 
 ```bash
 npm install -D @playwright/test
 npx playwright install chromium
 ```
 
-- [ ] **Step 2: 建立 `playwright.config.js`**
+- [x] **Step 2: 建立 `playwright.config.js`**
 
 ```js
 const { defineConfig, devices } = require('@playwright/test');
@@ -468,14 +499,14 @@ module.exports = defineConfig({
 
 （刻意不設定 `webServer` 選項——依專案規格，E2E 測試假設 `http://localhost:3001` 已由使用者另行以 `npm run start` 啟動。）
 
-- [ ] **Step 3: 新增 `package.json` script**
+- [x] **Step 3: 新增 `package.json` script**
 
 在 `"test"` 之後加入：
 ```json
 "test:e2e": "playwright test",
 ```
 
-- [ ] **Step 4: 更新 `.gitignore`**
+- [x] **Step 4: 更新 `.gitignore`**
 
 在檔案末尾加入：
 ```
@@ -485,7 +516,7 @@ module.exports = defineConfig({
 /tests/e2e/screenshots/
 ```
 
-- [ ] **Step 5: 建立最小驗證用 spec 確認設定可執行**
+- [x] **Step 5: 建立最小驗證用 spec 確認設定可執行**
 
 先手動啟動伺服器（另開一個 terminal，或在此步驟以背景方式啟動）：
 ```bash
@@ -503,14 +534,14 @@ test('home page loads from the already-running server', async ({ page }) => {
 });
 ```
 
-- [ ] **Step 6: 執行驗證**
+- [x] **Step 6: 執行驗證**
 
 ```bash
 npm run test:e2e
 ```
 Expected: PASS（1 個測試通過，證明 Playwright 能連上已啟動的 `localhost:3001`）。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add package.json playwright.config.js .gitignore tests/e2e/_smoke.spec.js
@@ -541,7 +572,7 @@ EOF
 
 純附加屬性，不影響既有 `class`／`v-model`／樣式與行為。
 
-- [ ] **Step 1: 修改 `views/pages/login.ejs`**
+- [x] **Step 1: 修改 `views/pages/login.ejs`**
 
 找到 email／password 的 `<input>` 與送出按鈕，各自加上 `data-testid`：
 ```html
@@ -552,11 +583,11 @@ EOF
 
 （因無法在此列出該檔案每一行既有屬性的精確順序，執行者請開啟 `views/pages/login.ejs`，在上述兩個 `<input>` 與送出 `<button>` 的既有屬性清單中，比照本專案既有屬性換行風格，各自新增一行 `data-testid="..."`，不得刪除或調整既有屬性。）
 
-- [ ] **Step 2: 修改 `views/pages/index.ejs`**
+- [x] **Step 2: 修改 `views/pages/index.ejs`**
 
 找到 `@click.stop="addToCart(product)"` 的按鈕，加上 `data-testid="add-to-cart"`（同一屬性值會出現在每張商品卡片上，這是預期行為，Playwright 測試會用 `page.getByTestId('add-to-cart').first()` 或先用商品名稱定位卡片範圍再找按鈕）。
 
-- [ ] **Step 3: 修改 `views/pages/checkout.ejs`**
+- [x] **Step 3: 修改 `views/pages/checkout.ejs`**
 
 在 Task 6（前一輪配送費用模組）新增的四個 `<input>`（兩個 radio、兩個 checkbox）與送出按鈕，各自加上：
 ```html
@@ -570,11 +601,11 @@ EOF
 ```
 送出按鈕（`@click="submitOrder"`）加上 `data-testid="checkout-submit"`。同時為收件人姓名/Email/地址三個既有 `<input>` 加上 `data-testid="recipient-name"`／`"recipient-email"`／`"recipient-address"`。
 
-- [ ] **Step 4: 修改 `views/pages/order-detail.ejs`**
+- [x] **Step 4: 修改 `views/pages/order-detail.ejs`**
 
 找到顯示 `statusMap[order.status]?.label` 的 `<span>`，加上 `data-testid="order-status"`。
 
-- [ ] **Step 5: 手動驗證頁面仍正常運作**
+- [x] **Step 5: 手動驗證頁面仍正常運作**
 
 ```bash
 npm run start &
@@ -584,7 +615,7 @@ curl -s http://localhost:3001/ | grep -c "data-testid"
 ```
 Expected: 兩個指令皆印出大於 0 的數字，代表 `data-testid` 屬性確實被伺服器端渲染輸出到 HTML（因為是 EJS 靜態屬性，非 Vue 動態插入，curl 純文字即可看到）。手動確認後終止背景伺服器（`kill %1` 或依環境慣例）。
 
-- [ ] **Step 6: 執行全套既有測試確認未破壞**
+- [x] **Step 6: 執行全套既有測試確認未破壞**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -592,7 +623,7 @@ npm test
 ```
 Expected: 12 個測試檔全數 PASS（純新增 HTML 屬性，不影響任何 API 行為）。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add views/pages/login.ejs views/pages/index.ejs views/pages/checkout.ejs views/pages/order-detail.ejs
@@ -616,7 +647,7 @@ EOF
 
 此 Task 性質為**探索**，不是「寫測試→失敗→實作→通過」的標準 TDD 循環，因為在真正看到綠界/土地銀行頁面之前，沒有人知道正確的選擇器是什麼。執行者必須實際跑過一次流程並記錄真實觀察，禁止憑空編造選擇器。
 
-- [ ] **Step 1: 確認伺服器已啟動且有可用測試訂單**
+- [x] **Step 1: 確認伺服器已啟動且有可用測試訂單**
 
 ```bash
 npm run start &
@@ -625,7 +656,7 @@ curl -s -X POST http://localhost:3001/api/auth/login -H "Content-Type: applicati
 ```
 記下印出的 token，供下一步使用。
 
-- [ ] **Step 2: 用 API 直接建立一筆待付款訂單（略過 UI，節省探索時間）**
+- [x] **Step 2: 用 API 直接建立一筆待付款訂單（略過 UI，節省探索時間）**
 
 ```bash
 # 以上一步的 token 取代 <TOKEN>
@@ -636,7 +667,7 @@ curl -s -X POST http://localhost:3001/api/orders -H "Content-Type: application/j
 ```
 記下回應中的訂單 `id`，取代下一步的 `<ORDER_ID>`。
 
-- [ ] **Step 3: 寫拋棄式 Playwright 探索腳本，導向綠界付款頁並逐步截圖**
+- [x] **Step 3: 寫拋棄式 Playwright 探索腳本，導向綠界付款頁並逐步截圖**
 
 在 Claude 工作階段的 scratchpad 目錄（**不是**專案目錄）建立 `explore-ecpay.spec.js`：
 
@@ -661,11 +692,11 @@ test('explore ecpay staging flow', async ({ page }) => {
 npx playwright test SCRATCHPAD_DIR/explore-ecpay.spec.js --config=playwright.config.js
 ```
 
-- [ ] **Step 4: 讀取截圖，辨識「網路ATM」選項的真實選擇器，更新探索腳本繼續往下一步**
+- [x] **Step 4: 讀取截圖，辨識「網路ATM」選項的真實選擇器，更新探索腳本繼續往下一步**
 
 用 Read 工具讀取 `SCRATCHPAD_DIR/01-ecpay-landing.png`，肉眼確認頁面內容與 Step 3 印出的 `BUTTONS/LINKS` 清單，找出「網路ATM」對應的真實文字或元素。在探索腳本追加對應的 `page.click(...)` 或 `page.getByText(...).click()`，重新執行，重複「執行 → 讀取新截圖 → 追加下一步選擇器」直到完整走完：選網路ATM → 選台灣土地銀行 → 點擊前往付款 → （若彈出提示視窗）關閉 → 土地銀行頁面點擊 Save → 等待綠界顯示付款成功 → 點擊返回商店。每一步都截圖存到 `SCRATCHPAD_DIR/NN-描述.png`。
 
-- [ ] **Step 5: 確認最終導回商店後訂單狀態**
+- [x] **Step 5: 確認最終導回商店後訂單狀態**
 
 流程跑完後，用 API 直接確認：
 ```bash
@@ -673,11 +704,11 @@ curl -s http://localhost:3001/api/orders/<ORDER_ID> -H "Authorization: Bearer <T
 ```
 Expected: 印出 `paid`。若不是，代表探索過程中某一步選錯了選項（例如選到會導致付款失敗的分支），回頭檢查 Step 4 截圖，修正腳本重跑。
 
-- [ ] **Step 6: 記錄發現**
+- [x] **Step 6: 記錄發現**
 
 把 Step 3～5 過程中確認有效的完整選擇器序列與網域清單（例如土地銀行的實際網域名稱），整理成清單，供 Task 7 撰寫正式 spec 時直接使用。此清單只需存在於執行者的工作記錄（例如本計畫的 ledger 或下一個 Task 的 brief 說明），不建立任何專案內檔案，探索腳本與截圖執行完畢後留在 scratchpad 即可，不需清理（scratchpad 本來就不納入版控）。
 
-- [ ] **Step 7: 無需 commit**（本 Task 不產生任何專案內變更）
+- [x] **Step 7: 無需 commit**（本 Task 不產生任何專案內變更）
 
 ---
 
@@ -690,7 +721,7 @@ Expected: 印出 `paid`。若不是，代表探索過程中某一步選錯了選
 **Interfaces:**
 - Consumes: Task 5 的 `data-testid` 屬性名稱、Task 6 探索得到的綠界/土地銀行真實選擇器與網域。
 
-- [ ] **Step 1: 刪除 smoke spec，建立正式 spec**
+- [x] **Step 1: 刪除 smoke spec，建立正式 spec**
 
 ```bash
 rm tests/e2e/_smoke.spec.js
@@ -757,7 +788,7 @@ test('full checkout flow: login -> add to cart -> checkout -> ECPay payment -> p
 
 **執行者注意**：第 6～13 步（`=== 以下步驟依 Task 6 探索結果實際填入 ===` 區塊）在動手實作本 Task 時，必須用 Task 6 實際探索得到的真實選擇器取代，禁止照抄上面骨架直接視為完成——上面骨架只包含本地部分（步驟 1～5、14～16）是可直接使用的最終程式碼，中間綠界/土地銀行的操作步驟**必須**依 Task 6 的發現記錄補上真實的 `page.click(...)` / `page.getByText(...)` / `page.frameLocator(...)`（若土地銀行頁面是 iframe，需要用 `frameLocator`）等呼叫，並在每一步之間視需要加上 `page.waitForLoadState()` 或明確的等待條件。
 
-- [ ] **Step 2: 執行測試**
+- [x] **Step 2: 執行測試**
 
 ```bash
 npm run start &
@@ -766,14 +797,14 @@ npm run test:e2e
 ```
 Expected: PASS。若失敗，依 `playwright-report/` 的 trace 與截圖檢查是哪一步選擇器不對，回到 Task 6 的探索腳本重新確認該步驟。
 
-- [ ] **Step 3: 確認成功截圖確實產生**
+- [x] **Step 3: 確認成功截圖確實產生**
 
 ```bash
 ls test-results/e2e-payment-success-*.png
 ```
 Expected: 至少存在一個檔案。
 
-- [ ] **Step 4: Commit**（只 commit 測試程式碼，不 commit 截圖／報告——`.gitignore` 已在 Task 4 排除 `test-results/`）
+- [x] **Step 4: Commit**（只 commit 測試程式碼，不 commit 截圖／報告——`.gitignore` 已在 Task 4 排除 `test-results/`）
 
 ```bash
 git add tests/e2e/checkout-ecpay.spec.js
@@ -798,20 +829,20 @@ EOF
 **Interfaces:**
 - Produces: `generateCollection()` 產出的 collection 中，所有 `request.auth.bearer[].value` 皆為 `{{token}}`（非 `{{bearerToken}}`），登入/註冊 test script 寫入 `pm.environment.set('token', ...)`。
 
-- [ ] **Step 1: 修改測試（先改測試，符合現有專案對這個檔案的測試風格）**
+- [x] **Step 1: 修改測試（先改測試，符合現有專案對這個檔案的測試風格）**
 
 `tests/postman.generator.test.js` 中所有 `bearerToken` 字樣改為 `token`：
 - `pm.environment.set('bearerToken'` → `pm.environment.set('token'`
 - `.find((b) => b.key === 'token').value).toBe('{{bearerToken}}')` → `.toBe('{{token}}')`
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/postman.generator.test.js
 ```
 Expected: FAIL（目前程式碼仍產出 `bearerToken`，測試期待 `token`）。
 
-- [ ] **Step 3: 修改 `src/postman/generator.js`**
+- [x] **Step 3: 修改 `src/postman/generator.js`**
 
 在 `TOKEN_CAPTURE_SCRIPT` 常數中，把：
 ```js
@@ -844,14 +875,14 @@ function renameBearerVariable(items) {
   renameBearerVariable(collection.item);
 ```
 
-- [ ] **Step 4: 執行測試，確認通過**
+- [x] **Step 4: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/postman.generator.test.js
 ```
 Expected: PASS（5 個 it 全數通過）。
 
-- [ ] **Step 5: 修改 `postman/environment.json`**
+- [x] **Step 5: 修改 `postman/environment.json`**
 
 把 `bearerToken` 那筆變數的 `key` 改為 `token`，並新增一筆 `sessionId`：
 ```json
@@ -869,7 +900,7 @@ Expected: PASS（5 個 it 全數通過）。
 }
 ```
 
-- [ ] **Step 6: 重新產生 collection 並人工確認**
+- [x] **Step 6: 重新產生 collection 並人工確認**
 
 ```bash
 npm run openapi
@@ -883,7 +914,7 @@ console.log(JSON.stringify(item.request.auth));
 ```
 Expected: 印出的 `bearer` 陣列中 `value` 為 `{{token}}`，不是 `{{bearerToken}}`。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/postman/generator.js postman/environment.json tests/postman.generator.test.js
@@ -907,20 +938,20 @@ EOF
 
 **Interfaces:** 無。
 
-- [ ] **Step 1: 更新 `.gitignore`**
+- [x] **Step 1: 更新 `.gitignore`**
 
 加入：
 ```
 postman/collection.json
 ```
 
-- [ ] **Step 2: 從 git 追蹤移除但保留本機檔案**
+- [x] **Step 2: 從 git 追蹤移除但保留本機檔案**
 
 ```bash
 git rm --cached postman/collection.json
 ```
 
-- [ ] **Step 3: 確認檔案仍存在於本機**
+- [x] **Step 3: 確認檔案仍存在於本機**
 
 ```bash
 ls postman/collection.json
@@ -928,7 +959,7 @@ git status --short postman/
 ```
 Expected: `ls` 顯示檔案仍存在；`git status` 顯示 `postman/collection.json` 不再是已追蹤或待加入狀態（因已被 `.gitignore`）。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add .gitignore
@@ -952,7 +983,7 @@ EOF
 
 **Interfaces:** 無（純文件更新與歸檔）。
 
-- [ ] **Step 1: 更新 `docs/README.md` 常用指令表**
+- [x] **Step 1: 更新 `docs/README.md` 常用指令表**
 
 在既有 `npm run test`／`npm run test:unit` 等列之後新增：
 ```
@@ -960,7 +991,7 @@ EOF
 | `npm run test:e2e` | 執行 Playwright E2E 測試（需先手動 `npm run start`） |
 ```
 
-- [ ] **Step 2: 更新 `docs/TESTING.md`**
+- [x] **Step 2: 更新 `docs/TESTING.md`**
 
 新增一節說明 Integration Test 與 E2E Test：
 ```markdown
@@ -973,7 +1004,7 @@ EOF
 `npm run test:e2e` 使用 Playwright，測試前須先手動執行 `npm run start` 啟動伺服器（測試本身不會自動啟動），對 `http://localhost:3001` 進行真實瀏覽器操作，涵蓋登入、加入購物車、結帳、綠界付款（網路ATM／土地銀行測試環境）到訂單狀態確認為 `paid` 的完整流程。因涉及第三方頁面（綠界／土地銀行測試環境），其 DOM 結構不受本專案控制，未來對方介面異動可能導致測試失效，需視情況更新 `tests/e2e/checkout-ecpay.spec.js` 的選擇器。
 ```
 
-- [ ] **Step 3: 更新 `docs/CHANGELOG.md`**
+- [x] **Step 3: 更新 `docs/CHANGELOG.md`**
 
 在 `## [Unreleased]` 的 `### Added` 小節最前面加入：
 ```
@@ -982,7 +1013,7 @@ EOF
 - Postman 變數 `bearerToken` 統一改名為 `token`，新增 `sessionId` 變數；`postman/collection.json` 移出版控，改為執行 `npm run postman` 產生
 ```
 
-- [ ] **Step 4: 執行完整驗證**
+- [x] **Step 4: 執行完整驗證**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -995,7 +1026,7 @@ git status --short
 ```
 Expected: `test`／`test:unit`／`test:integration` 皆全數 PASS；`openapi`／`postman` 皆成功產生；`git status` 除本步驟即將 commit 的文件變更外，不應出現 `postman/collection.json`（已在 Task 9 被 gitignore）。`test:e2e` 因需要手動啟動的伺服器與真實綠界流程，不在此自動化驗證範圍內，由 Task 7 的驗證步驟涵蓋。
 
-- [ ] **Step 5: 歸檔計畫檔並 Commit**
+- [x] **Step 5: 歸檔計畫檔並 Commit**
 
 ```bash
 mkdir -p docs/plans/archive
