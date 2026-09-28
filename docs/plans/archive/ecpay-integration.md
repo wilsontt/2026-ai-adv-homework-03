@@ -1,5 +1,23 @@
 # 綠界 ECPay AIO 金流串接計畫
 
+## 執行紀錄（全部完成）
+
+本計畫早於本 repo 可追溯的分階段 commit 歷史（`src/utils/ecpay.js`、`pageRoutes.js` 的 ECPay 路由等，皆已存在於本分支起始的第一個 commit `1f390f7`），無逐步 commit 或 SDD ledger 可回溯，故以下改為直接核對現有程式碼確認每個 Step 皆已落地：
+
+| Step | 狀態 | 對應程式碼 |
+|------|------|------------|
+| 1. `src/utils/ecpay.js` 工具函式 | ✅ 完成 | 檔案存在，`module.exports` 匯出六個函式 |
+| 2. `merchant_trade_no` 欄位遷移 | ✅ 完成 | `src/database.js`：`ALTER TABLE orders ADD COLUMN merchant_trade_no TEXT` |
+| 3a. 建立訂單寫入 `merchant_trade_no` | ✅ 完成 | `src/routes/orderRoutes.js` INSERT 語句含該欄位 |
+| 3b. `POST /:id/check-payment` | ✅ 完成 | `src/routes/orderRoutes.js:161` 呼叫 `queryTradeInfo(order.merchant_trade_no)` |
+| 3c. 保留 `PATCH /:id/pay` | ✅ 完成 | 路由仍存在 |
+| 4. `GET /ecpay/payment/:orderId` | ✅ 完成 | `src/routes/pageRoutes.js:61` |
+| 5. 結帳頁導向 ECPay 付款頁 | ✅ 完成 | `public/js/pages/checkout.js:60` |
+| 6. `order-detail.js` 查詢付款狀態 | ✅ 完成 | `checkPayment()`，`onMounted` 依 `paymentResult === 'pending'` 自動觸發 |
+| 7. `order-detail.ejs` 付款區域 UI | ✅ 完成 | 「查詢付款狀態」／「前往付款」按鈕皆存在 |
+
+補充：後續 `2026-09-27-integration-e2e-postman` 計畫的 Task 6 探索已實際走過一次真實綠界 staging＋土地銀行測試環境的完整付款流程，確認本計畫 Step 6（`onMounted` 自動查詢）與 Step 7（UI 按鈕）在真實流程下運作正確，訂單狀態確實會更新為 `paid`。
+
 ## Context
 
 花卉電商專案目前已有完整的購物車 → 結帳 → 建立訂單流程，但付款僅為模擬（前端按鈕直接 PATCH 狀態）。需串接綠界 AIO 金流，讓使用者能跳轉至綠界付款頁面完成付款。

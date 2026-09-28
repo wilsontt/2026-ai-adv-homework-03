@@ -25,6 +25,7 @@
         <span
           class="text-xs px-3 py-1 rounded-full font-medium"
           :class="statusMap[order.status]?.cls || 'bg-gray-100 text-gray-600'"
+          data-testid="order-status"
         >
           {{ statusMap[order.status]?.label || order.status }}
         </span>

@@ -11,12 +11,15 @@
 - **行為微調**：購物車 `quantity` 驗證改用 `z.union([z.number(), z.string().regex(/^\d+$/)])`，明確拒絕 boolean（如 `true`）與科學記號字串（如 `"1e2"`），修正原 `z.coerce.number()` 過於寬鬆意外將其轉換為合法數字的問題
 
 ### Added
+- 新增 Integration Test（`tests/integration/`，`npm run test:integration`）：獨立記憶體 SQLite，驗證訂單建立完整資料寫入、運費計算、庫存扣除、購物車清空與失敗情境不留髒資料
+- 新增 E2E Test（Playwright，`tests/e2e/`，`npm run test:e2e`）：涵蓋登入到綠界付款成功的完整流程
+- `postman/collection.json` 移出版控，改為執行 `npm run postman` 產生
 - 新增配送費用模組（`src/utils/shipping.js`）：宅配／超商取貨基本運費、偏遠地區與當日急件附加費、商品小計滿 1,500 元時**僅宅配**免基本運費（超商取貨仍需支付基本運費）；整合進 `POST /api/orders`，`total_amount` 語意調整為「商品小計 + 運費」
 - `orders` 表新增 `shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery` 欄位
 - 結帳頁新增配送方式選單與運費即時試算，取代原本未串接後端的假運費 UI；訂單詳情頁新增運費明細顯示
 - 新增 `npm run test:unit`，執行 `tests/shipping.test.js` 純函式單元測試
-- 新增 `npm run postman`（`generate-postman.js` + `src/postman/generator.js`）：由 `openapi.json` 產生 `postman/collection.json`，並為登入／註冊請求自動注入 test script，將回應 token 寫入環境變數 `bearerToken`
-- 新增 `postman/environment.json`：含 `baseUrl`、`adminEmail`、`adminPassword`、`bearerToken` 四個變數，供匯入 Postman 直接測試 API
+- 新增 `npm run postman`（`generate-postman.js` + `src/postman/generator.js`）：由 `openapi.json` 產生 `postman/collection.json`，並為登入／註冊請求自動注入 test script，將回應 token 寫入環境變數 `token`
+- 新增 `postman/environment.json`：含 `baseUrl`、`adminEmail`、`adminPassword`、`token`、`sessionId` 五個變數，供匯入 Postman 直接測試 API
 - 新增 `GET /openapi.json`（回傳 OpenAPI document）與 `GET /api-docs` Swagger UI 瀏覽頁
 - 綠界 ECPay AIO 金流串接：結帳後導向綠界付款頁面完成真實付款流程
 - 新增 `src/utils/ecpay.js` 工具模組：CheckMacValue 簽章產生/驗證、ECPay 專用 URL 編碼、QueryTradeInfo API 查詢

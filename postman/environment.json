@@ -21,9 +21,15 @@
       "enabled": true
     },
     {
-      "key": "bearerToken",
+      "key": "token",
       "value": "",
       "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "default",
       "enabled": true
     }
   ],

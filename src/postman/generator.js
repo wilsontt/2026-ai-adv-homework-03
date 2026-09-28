@@ -6,7 +6,7 @@ const TOKEN_CAPTURE_SCRIPT = [
   "if ([200, 201].includes(pm.response.code)) {",
   "  const body = pm.response.json();",
   "  if (body && body.data && body.data.token) {",
-  "    pm.environment.set('bearerToken', body.data.token);",
+  "    pm.environment.set('token', body.data.token);",
   "  }",
   "}"
 ];
@@ -54,6 +54,20 @@ function attachTokenCapture(collection) {
   }
 }
 
+function renameBearerVariable(items) {
+  for (const it of items) {
+    if (it.item) {
+      renameBearerVariable(it.item);
+    } else if (it.request && it.request.auth && it.request.auth.type === 'bearer') {
+      it.request.auth.bearer = it.request.auth.bearer.map((entry) =>
+        entry.key === 'token' && entry.value === '{{bearerToken}}'
+          ? { ...entry, value: '{{token}}' }
+          : entry
+      );
+    }
+  }
+}
+
 function setLoginBodyToEnvVars(collection) {
   for (const item of findItemsByPath(collection.item, 'api/auth/login', 'POST')) {
     item.request.body = {
@@ -70,6 +84,7 @@ async function generateCollection() {
   const collection = await convert(openapiData);
 
   attachTokenCapture(collection);
+  renameBearerVariable(collection.item);
   setLoginBodyToEnvVars(collection);
 
   return collection;

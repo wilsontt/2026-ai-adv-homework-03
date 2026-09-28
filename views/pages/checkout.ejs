@@ -19,6 +19,7 @@
               placeholder="請輸入收件人姓名"
               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary transition-colors"
               :class="{ 'border-red-400': errors.recipientName }"
+              data-testid="recipient-name"
             />
             <p v-if="errors.recipientName" class="text-red-500 text-xs mt-1">{{ errors.recipientName }}</p>
           </div>
@@ -30,6 +31,7 @@
               placeholder="請輸入 Email"
               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary transition-colors"
               :class="{ 'border-red-400': errors.recipientEmail }"
+              data-testid="recipient-email"
             />
             <p v-if="errors.recipientEmail" class="text-red-500 text-xs mt-1">{{ errors.recipientEmail }}</p>
           </div>
@@ -41,6 +43,7 @@
               placeholder="請輸入收件地址"
               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-primary transition-colors"
               :class="{ 'border-red-400': errors.recipientAddress }"
+              data-testid="recipient-address"
             />
             <p v-if="errors.recipientAddress" class="text-red-500 text-xs mt-1">{{ errors.recipientAddress }}</p>
           </div>
@@ -62,28 +65,28 @@
           <h3 class="text-sm font-medium text-text-primary">配送方式</h3>
           <label class="flex items-center justify-between text-sm cursor-pointer">
             <span>
-              <input type="radio" v-model="form.shippingMethod" value="home_delivery" class="mr-2" />
+              <input type="radio" v-model="form.shippingMethod" value="home_delivery" class="mr-2" data-testid="shipping-home-delivery" />
               宅配
             </span>
             <span class="text-text-secondary">NT$ 120</span>
           </label>
           <label class="flex items-center justify-between text-sm cursor-pointer">
             <span>
-              <input type="radio" v-model="form.shippingMethod" value="convenience_store" class="mr-2" />
+              <input type="radio" v-model="form.shippingMethod" value="convenience_store" class="mr-2" data-testid="shipping-convenience-store" />
               超商取貨
             </span>
             <span class="text-text-secondary">NT$ 60</span>
           </label>
           <label class="flex items-center justify-between text-sm cursor-pointer">
             <span>
-              <input type="checkbox" v-model="form.isRemoteArea" class="mr-2" />
+              <input type="checkbox" v-model="form.isRemoteArea" class="mr-2" data-testid="shipping-remote-area" />
               偏遠地區
             </span>
             <span class="text-text-secondary">+NT$ 200</span>
           </label>
           <label class="flex items-center justify-between text-sm cursor-pointer">
             <span>
-              <input type="checkbox" v-model="form.isRushDelivery" class="mr-2" />
+              <input type="checkbox" v-model="form.isRushDelivery" class="mr-2" data-testid="shipping-rush-delivery" />
               當日急件
             </span>
             <span class="text-text-secondary">+NT$ 250</span>
@@ -109,6 +112,7 @@
           @click="submitOrder"
           :disabled="submitting"
           class="w-full mt-4 bg-rose-primary text-white py-3 rounded-full text-sm font-medium hover:bg-rose-dark transition-colors disabled:opacity-50"
+          data-testid="checkout-submit"
         >
           {{ submitting ? '處理中...' : '確認送出訂單' }}
         </button>

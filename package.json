@@ -10,7 +10,9 @@
     "openapi": "node generate-openapi.js",
     "postman": "node generate-postman.js",
     "test:unit": "vitest run tests/shipping.test.js",
-    "test": "vitest run"
+    "test:integration": "vitest run --config vitest.integration.config.js",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^9.1.0",
@@ -27,6 +29,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/cli": "^4.2.2",
     "openapi-to-postmanv2": "^6.3.3",
     "supertest": "^7.2.2",

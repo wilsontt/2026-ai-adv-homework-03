@@ -26,14 +26,14 @@ describe('Postman collection generator', () => {
     expect(baseUrlVar).toBeDefined();
   });
 
-  it('attaches a test script to POST /api/auth/login that writes the token into bearerToken', async () => {
+  it('attaches a test script to POST /api/auth/login that writes the token into token', async () => {
     const collection = await generateCollection();
     const [loginItem] = findItemsByPath(collection.item, 'api/auth/login', 'POST');
 
     expect(loginItem).toBeDefined();
     const testEvent = loginItem.event.find((e) => e.listen === 'test');
     expect(testEvent).toBeDefined();
-    expect(testEvent.script.exec.join('\n')).toContain("pm.environment.set('bearerToken'");
+    expect(testEvent.script.exec.join('\n')).toContain("pm.environment.set('token'");
   });
 
   it('attaches the same test script to POST /api/auth/register', async () => {
@@ -43,7 +43,7 @@ describe('Postman collection generator', () => {
     expect(registerItem).toBeDefined();
     const testEvent = registerItem.event.find((e) => e.listen === 'test');
     expect(testEvent).toBeDefined();
-    expect(testEvent.script.exec.join('\n')).toContain("pm.environment.set('bearerToken'");
+    expect(testEvent.script.exec.join('\n')).toContain("pm.environment.set('token'");
   });
 
   it('rewrites the login request body to use {{adminEmail}} / {{adminPassword}}', async () => {
@@ -54,11 +54,11 @@ describe('Postman collection generator', () => {
     expect(loginItem.request.body.raw).toContain('{{adminPassword}}');
   });
 
-  it('wires protected endpoints to bearer auth using {{bearerToken}}', async () => {
+  it('wires protected endpoints to bearer auth using {{token}}', async () => {
     const collection = await generateCollection();
     const [profileItem] = findItemsByPath(collection.item, 'api/auth/profile', 'GET');
 
     expect(profileItem.request.auth.type).toBe('bearer');
-    expect(profileItem.request.auth.bearer.find((b) => b.key === 'token').value).toBe('{{bearerToken}}');
+    expect(profileItem.request.auth.bearer.find((b) => b.key === 'token').value).toBe('{{token}}');
   });
 });

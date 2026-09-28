@@ -118,6 +118,7 @@
               @click.stop="addToCart(product)"
               :disabled="product._adding || product.stock <= 0"
               class="w-full bg-rose-primary text-white py-2 rounded-full text-sm hover:bg-rose-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="add-to-cart"
             >
               {{ product.stock <= 0 ? '已售完' : '加入購物車' }}
             </button>
