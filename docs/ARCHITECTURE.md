@@ -6,11 +6,19 @@
 ├── app.js                          # Express 應用設定：view engine、靜態檔案、middleware 串接、路由掛載、GET /openapi.json、Swagger UI（/api-docs）、404/錯誤處理
 ├── server.js                       # 伺服器啟動入口，監聽 PORT（預設 3001）
 ├── package.json                    # 專案設定與 npm scripts
-├── vitest.config.js                # Vitest 測試設定（循序執行、檔案順序）
+├── vitest.config.js                # 主測試套件設定（循序執行、檔案順序；排除 tests/integration/**、tests/e2e/**）
+├── vitest.integration.config.js    # Integration Test 專用設定：注入 DATABASE_PATH=':memory:'，只跑 tests/integration/**
+├── playwright.config.js            # E2E Test（Playwright）設定：baseURL http://localhost:3001，不自動啟動伺服器
 ├── generate-openapi.js             # 由 src/openapi/generator.js 產生並以 swagger-parser 驗證後寫入 openapi.json
-├── database.sqlite                 # SQLite 資料庫檔案（自動建立）
+├── generate-postman.js             # 由 src/postman/generator.js 將 openapi.json 轉換為 postman/collection.json
+├── openapi.json                    # 產生後的 OpenAPI document（版控追蹤，供 /openapi.json、/api-docs、Postman 轉換使用）
+├── database.sqlite                 # SQLite 資料庫檔案（自動建立；DATABASE_PATH 環境變數可覆寫路徑，Integration Test 用 :memory:）
 ├── .env                            # 環境變數（不進版控）
 ├── .env.example                    # 環境變數範本
+│
+├── .github/
+│   └── workflows/
+│       └── test.yml                # GitHub Actions：push/PR 時自動執行 npm run test:unit 與 npm run test:integration
 │
 ├── src/
 │   ├── database.js                 # 資料庫初始化：建表、WAL 模式、foreign keys、種子資料（admin + 8 個花卉商品）
@@ -32,13 +40,16 @@
 │   │   ├── registry.js             # OpenAPIRegistry 實例，註冊 bearerAuth / sessionAuth securitySchemes
 │   │   ├── generator.js            # 彙整 registry + 六個 paths 檔 → OpenApiGeneratorV3 → OpenAPI document
 │   │   └── paths/                  # 各模組 registry.registerPath()，只依賴 schemas，不 require 路由或 database.js
+│   ├── postman/
+│   │   └── generator.js            # 將 openapi.json（經 openapi-to-postmanv2）轉換為 Postman Collection：注入登入/註冊 test script 自動寫入 {{token}}、將所有受保護端點的 bearer 變數統一改名為 token
 │   ├── utils/
-│   │   └── ecpay.js                # 綠界 ECPay 工具：CheckMacValue 簽章、URL 編碼、AIO 表單產生、QueryTradeInfo 查詢
+│   │   ├── ecpay.js                # 綠界 ECPay 工具：CheckMacValue 簽章、URL 編碼、AIO 表單產生、QueryTradeInfo 查詢
+│   │   └── shipping.js             # 配送費用純函式：宅配/超商基本運費、偏遠地區/當日急件附加費、滿額（僅宅配）免基本運費
 │   └── routes/
 │       ├── authRoutes.js           # 認證路由：註冊、登入、個人資料
 │       ├── productRoutes.js        # 公開商品路由：列表（分頁）、詳情
 │       ├── cartRoutes.js           # 購物車路由：CRUD（含 dualAuth 雙模式認證邏輯）
-│       ├── orderRoutes.js          # 訂單路由：建立、列表、詳情、模擬付款、綠界付款查詢（全部需 JWT）
+│       ├── orderRoutes.js          # 訂單路由：建立（含運費計算）、列表、詳情、模擬付款、綠界付款查詢（全部需 JWT）
 │       ├── adminProductRoutes.js   # 後台商品路由：CRUD（需 JWT + admin）
 │       ├── adminOrderRoutes.js     # 後台訂單路由：列表（含狀態篩選）、詳情（需 JWT + admin）
 │       └── pageRoutes.js           # 頁面路由：渲染 EJS 模板（無認證）+ 綠界付款表單頁
@@ -89,14 +100,28 @@
 │           ├── admin-products.js   # 後台商品管理腳本
 │           └── admin-orders.js     # 後台訂單管理腳本
 │
+├── postman/
+│   ├── environment.json            # Postman environment：baseUrl／adminEmail／adminPassword／token／sessionId（手寫維護，版控追蹤）
+│   └── collection.json             # 由 npm run postman 自動產生（不納入版控，需要時本機重新產生）
+│
 └── tests/
-    ├── setup.js                    # 測試輔助：getAdminToken()、registerUser()
-    ├── auth.test.js                # 認證 API 測試
-    ├── products.test.js            # 商品 API 測試
-    ├── cart.test.js                # 購物車 API 測試
-    ├── orders.test.js              # 訂單 API 測試
-    ├── adminProducts.test.js       # 後台商品 API 測試
-    └── adminOrders.test.js         # 後台訂單 API 測試
+    ├── setup.js                        # 測試輔助：getAdminToken()、registerUser()
+    ├── auth.test.js                    # 認證 API 測試
+    ├── products.test.js                # 商品 API 測試
+    ├── cart.test.js                    # 購物車 API 測試
+    ├── orders.test.js                  # 訂單 API 測試（含運費計算、check-payment）
+    ├── adminProducts.test.js           # 後台商品 API 測試
+    ├── adminOrders.test.js             # 後台訂單 API 測試
+    ├── shipping.test.js                # 配送費用純函式單元測試（npm run test:unit）
+    ├── schemas.common.test.js          # 共用分頁 normalize 函式、errorEnvelope、securitySchemes 測試
+    ├── middleware.validate.test.js     # validate(schema) middleware 成功/失敗路徑測試
+    ├── openapi.generator.test.js       # OpenAPI document 產出與 swagger-parser 驗證測試
+    ├── openapi.test.js                 # GET /openapi.json、GET /api-docs 端點測試
+    ├── postman.generator.test.js       # Postman Collection 產生器測試（token 變數改名、bearer auth 注入）
+    ├── integration/
+    │   └── order-flow.integration.test.js  # Integration Test：獨立記憶體 SQLite，完整訂單建立流程與失敗情境（npm run test:integration）
+    └── e2e/
+        └── checkout-ecpay.spec.js      # E2E Test（Playwright）：登入到綠界付款成功的完整瀏覽器流程（npm run test:e2e）
 ```
 
 ## 啟動流程
@@ -294,7 +319,7 @@ server.js
 ## 資料庫 Schema
 
 引擎：SQLite3（better-sqlite3，同步 API）  
-檔案：`database.sqlite`（專案根目錄，自動建立）  
+檔案：`database.sqlite`（專案根目錄，自動建立；可用 `DATABASE_PATH` 環境變數覆寫，Integration Test 以此注入 `:memory:` 達成完全隔離，見「測試分層與 CI」章節）  
 模式：WAL（Write-Ahead Logging），啟用 foreign keys
 
 ### users
@@ -437,3 +462,27 @@ Body: { "action": "success" | "fail" }
   pending ──fail────→ failed
   paid / failed → 400 INVALID_STATUS（不可逆）
 ```
+
+## 測試分層與 CI
+
+專案測試分為四層，各自獨立設定、互不干擾：
+
+| 層級 | 指令 | 設定檔 | 資料庫 | 涵蓋範圍 |
+|------|------|--------|--------|----------|
+| 主測試套件 | `npm test` | `vitest.config.js` | `database.sqlite`（持久化，跨檔案共用種子資料，循序執行） | API 端點、schema、middleware、OpenAPI 產出、Postman 產生器 |
+| Unit | `npm run test:unit` | `vitest.config.js`（子集） | 無（純函式，不觸碰 DB） | `src/utils/shipping.js` |
+| Integration | `npm run test:integration` | `vitest.integration.config.js` | `:memory:`（`DATABASE_PATH` 注入，每次全新） | 訂單建立完整流程、失敗情境不留髒資料 |
+| E2E | `npm run test:e2e` | `playwright.config.js` | 需先手動 `npm run start`，對已啟動伺服器操作真實瀏覽器 | 登入到綠界付款成功的完整流程（含真實綠界 staging／土地銀行測試環境） |
+
+`src/database.js` 的資料庫路徑可由 `DATABASE_PATH` 環境變數覆寫（`process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.sqlite')`），未設定時行為與原本完全一致；Integration Test 專門利用此機制注入 `:memory:` 達成完全隔離，不會影響正式 `database.sqlite`。
+
+**CI（`.github/workflows/test.yml`）**：push 或開 PR 時，於 `ubuntu-latest` 上以 Node 20.x 依序執行 `npm ci` → `npm run test:unit` → `npm run test:integration`（不含 E2E、不啟動額外服務）。因 CI 上沒有本機 `.env`，而 `JWT_SECRET` 在 `authRoutes.js`／`authMiddleware.js` 中沒有預設值，workflow 於 Integration Test 步驟額外設定 CI 專用（非正式環境）的 `JWT_SECRET` 值，避免 `jwt.sign()` 因缺少必要環境變數而拋出例外。詳見 `docs/TESTING.md`。
+
+## Postman Collection 產生
+
+`generate-postman.js` 呼叫 `src/postman/generator.js` 的 `generateCollection()`：以 `openapi-to-postmanv2` 將 `openapi.json` 轉換為 Postman Collection，再做兩層後製：
+
+1. **`attachTokenCapture()`**：為登入／註冊請求注入 test script，成功時把回應的 `data.token` 寫入 Postman 環境變數 `token`
+2. **`renameBearerVariable()`**：遞迴走訪所有請求，把 `openapi-to-postmanv2` 預設產出的 `{{bearerToken}}` bearer 變數統一改名為 `{{token}}`，確保所有受保護端點與 test script 寫入的變數名稱一致
+
+產出的 `postman/collection.json` 為建置產物，不納入版控，需要時執行 `npm run postman` 本機重新產生；`postman/environment.json`（含 `baseUrl`／`adminEmail`／`adminPassword`／`token`／`sessionId`）為手寫維護設定檔，保留版控。
