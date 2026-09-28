@@ -10,6 +10,32 @@
 
 **Spec:** `docs/plans/2026-09-27-openapi-migration.md`（本檔案上半部 User Story / Spec 兩節）
 
+## 執行紀錄（全部完成）
+
+本計畫執行於較早階段，執行時的本機 SDD ledger（gitignore 暫存檔）已不存在，以下依 git commit 歷史回溯確認每個 Task 皆有對應落地的 commit：
+
+| Task | 狀態 | Commit |
+|------|------|--------|
+| 1. 安裝與移除相依套件 | ✅ 完成 | `01576a7` |
+| 2. `registry.js` + `common.schema.js` | ✅ 完成 | `24eb419` |
+| 3. `validate.js` middleware | ✅ 完成 | `c66d0a2` |
+| 4. Auth 模組 | ✅ 完成 | `5e44038` |
+| 5. Cart 模組 | ✅ 完成 | `8127a49` |
+| 6. Order 模組 | ✅ 完成 | `6c97955` |
+| 7. Product 模組 | ✅ 完成 | `309b7db` |
+| 8. Admin Order 模組 | ✅ 完成 | `0fb6b57` |
+| 9. Admin Product 模組 | ✅ 完成 | `5241072` |
+| 10. `generator.js` + `generate-openapi.js` + 刪除 `swagger-config.js` | ✅ 完成 | `e2ef6d0` |
+| 11. `app.js` 掛載 `/openapi.json` 與 `/api-docs` | ✅ 完成 | `eb3f77b` |
+| 12. 文件同步並歸檔計畫 | ✅ 完成 | `700e387` |
+
+**歸檔後的最終審查修正（依 commit 訊息回溯，非本機留存的完整審查記錄）：**
+- `fb9da59` fix: 修正終審發現之 Zod v4 相容性與 nullable 欄位回歸，並補齊文件同步
+- `26aca83` fix: OpenAPI 文件補齊回應狀態碼並重用 page/limit runtime schema
+- `b7be4d9` fix: 收緊 cart quantity 的型別驗證，避免 boolean/科學記號字串意外通過
+- `0abd434` test: 補齊 Review Focus 測試缺口並新增 openapi.json 防漂移測試
+- `21ac2e2` fix: 還原遷移過程中意外刪除的說明性註解
+
 ## Global Constraints
 
 - 端點路徑、HTTP 方法、狀態碼不可變動；回應格式一律為 `{ data, error, message }`，驗證失敗固定回傳 400 + `error: 'VALIDATION_ERROR'`。
@@ -142,19 +168,19 @@ const fs = require('fs');
 
 **Interfaces:** 無（純套件安裝，不產生程式介面）。
 
-- [ ] **Step 1: 安裝新套件**
+- [x] **Step 1: 安裝新套件**
 
 ```bash
 npm install zod @asteasolutions/zod-to-openapi swagger-parser swagger-ui-express
 ```
 
-- [ ] **Step 2: 移除舊套件**
+- [x] **Step 2: 移除舊套件**
 
 ```bash
 npm uninstall swagger-jsdoc
 ```
 
-- [ ] **Step 3: 驗證套件可正常載入**
+- [x] **Step 3: 驗證套件可正常載入**
 
 ```bash
 node -e "require('zod'); require('@asteasolutions/zod-to-openapi'); require('swagger-parser'); require('swagger-ui-express'); console.log('OK')"
@@ -162,7 +188,7 @@ node -e "require('zod'); require('@asteasolutions/zod-to-openapi'); require('swa
 
 Expected: 印出 `OK`，無例外拋出。
 
-- [ ] **Step 4: 確認 package.json 異動**
+- [x] **Step 4: 確認 package.json 異動**
 
 ```bash
 git diff package.json
@@ -170,7 +196,7 @@ git diff package.json
 
 Expected: `dependencies` 新增 4 個套件、移除 `swagger-jsdoc`。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json package-lock.json
@@ -195,7 +221,7 @@ EOF
 - Produces（`src/openapi/registry.js`）：`module.exports = registry`，一個 `OpenAPIRegistry` 實例，已註冊 `securitySchemes.bearerAuth`（`{ type:'http', scheme:'bearer', bearerFormat:'JWT' }`）與 `securitySchemes.sessionAuth`（`{ type:'apiKey', in:'header', name:'X-Session-Id' }`）。所有 `src/openapi/paths/*.js` 皆消費此模組。
 - Produces（`src/schemas/common.schema.js`）：`{ pageQuerySchema, limitQuerySchema, paginationSchema, errorEnvelope, normalizePage, normalizeLimit }`。`pageQuerySchema`/`limitQuerySchema` 為 Zod schema（`parse(undefined)` 回傳數字，非 `undefined`）；`errorEnvelope(dataSchema)` 回傳 `z.object({ data: dataSchema, error: z.string().nullable(), message: z.string() })`；`paginationSchema` 為 `{ total, page, limit, totalPages }`（皆 `z.number()`）。Task 7/8/9 消費 `pageQuerySchema`/`limitQuerySchema`/`paginationSchema`；所有 paths 檔消費 `errorEnvelope`。
 
-- [ ] **Step 1: 寫測試（common schema 的邊界行為與 registry 的 securitySchemes）**
+- [x] **Step 1: 寫測試（common schema 的邊界行為與 registry 的 securitySchemes）**
 
 建立 `tests/schemas.common.test.js`：
 
@@ -264,7 +290,7 @@ describe('registry', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/schemas.common.test.js
@@ -272,7 +298,7 @@ npx vitest run tests/schemas.common.test.js
 
 Expected: FAIL（`Cannot find module '../src/schemas/common.schema'` / `'../src/openapi/registry'`）。
 
-- [ ] **Step 3: 實作 `src/schemas/common.schema.js`**
+- [x] **Step 3: 實作 `src/schemas/common.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -314,7 +340,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 實作 `src/openapi/registry.js`**
+- [x] **Step 4: 實作 `src/openapi/registry.js`**
 
 ```js
 const { OpenAPIRegistry } = require('@asteasolutions/zod-to-openapi');
@@ -336,7 +362,7 @@ registry.registerComponent('securitySchemes', 'sessionAuth', {
 module.exports = registry;
 ```
 
-- [ ] **Step 5: 執行測試，確認通過**
+- [x] **Step 5: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/schemas.common.test.js
@@ -344,7 +370,7 @@ npx vitest run tests/schemas.common.test.js
 
 Expected: PASS（4 個 it 全數通過）。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/schemas/common.schema.js src/openapi/registry.js tests/schemas.common.test.js
@@ -368,7 +394,7 @@ EOF
 - Consumes: 任一 Zod schema，其 `safeParse` 輸入形狀為 `{ body, query, params }`。
 - Produces: `module.exports = validate`；`validate(schema)` 回傳 Express middleware `(req, res, next) => void`。驗證成功時設定 `req.validated = { body, query, params }`（已通過 schema 轉換後的值）並呼叫 `next()`；失敗時呼叫 `res.status(400).json({ data: null, error: 'VALIDATION_ERROR', message })` 並「不」呼叫 `next()`。Task 4～9 的路由檔皆消費此函式與 `req.validated`。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 建立 `tests/middleware.validate.test.js`：
 
@@ -418,7 +444,7 @@ describe('validate middleware', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/middleware.validate.test.js
@@ -426,7 +452,7 @@ npx vitest run tests/middleware.validate.test.js
 
 Expected: FAIL（`Cannot find module '../src/middleware/validate'`）。
 
-- [ ] **Step 3: 實作 `src/middleware/validate.js`**
+- [x] **Step 3: 實作 `src/middleware/validate.js`**
 
 ```js
 const validate = (schema) => (req, res, next) => {
@@ -447,7 +473,7 @@ const validate = (schema) => (req, res, next) => {
 module.exports = validate;
 ```
 
-- [ ] **Step 4: 執行測試，確認通過**
+- [x] **Step 4: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/middleware.validate.test.js
@@ -455,7 +481,7 @@ npx vitest run tests/middleware.validate.test.js
 
 Expected: PASS（2 個 it 全數通過）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/middleware/validate.js tests/middleware.validate.test.js
@@ -483,7 +509,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`（Task 2）、`registry`（Task 2）。
 - Produces（`src/schemas/auth.schema.js`）：`{ registerBodySchema, loginBodySchema, registerRequestSchema, loginRequestSchema, authTokenResponseSchema, profileResponseSchema }`。`registerRequestSchema`/`loginRequestSchema` 供 `authRoutes.js` 的 `validate()` 使用；`registerBodySchema`/`loginBodySchema`/`authTokenResponseSchema`/`profileResponseSchema` 供 `auth.paths.js` 的 `registerPath()` 使用。
 
-- [ ] **Step 1: 於 `tests/auth.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/auth.test.js` 加入新測試**
 
 在檔案內 `describe('Auth API', () => { ... })` 的最後一個 `it` 之後、結尾 `});` 之前插入：
 
@@ -535,7 +561,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認新測試的結果符合預期**
+- [x] **Step 2: 執行測試，確認新測試的結果符合預期**
 
 ```bash
 npx vitest run tests/auth.test.js
@@ -543,7 +569,7 @@ npx vitest run tests/auth.test.js
 
 Expected: 除「password 型別錯誤」該筆測試外皆 PASS。現行手刻 if 驗證僅以 `!password` 判斷必填，`password: 123456` 是 truthy 的數字，不會被攔下，故該筆會先呼叫 `bcrypt.hashSync(123456, 10)`（bcrypt 內部對非字串輸入會拋出例外）並回應 500，而非預期的 400；此為現行程式碼在規格上的既有缺口，等 Step 5 換成 Zod 型別檢查後即會轉為 400 並通過。此筆測試允許在 Step 2 呈現 FAIL，其餘沿用既有行為的測試仍應在此步驟全數 PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/auth.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/auth.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -592,7 +618,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/auth.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/auth.paths.js`**
 
 ```js
 const registry = require('../registry');
@@ -640,7 +666,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/authRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/authRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -733,7 +759,7 @@ router.get('/profile', authMiddleware, (req, res) => {
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/auth.test.js
@@ -741,7 +767,7 @@ npx vitest run tests/auth.test.js
 
 Expected: PASS（含原有測試與 Step 1 新增測試）。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/auth.schema.js src/openapi/paths/auth.paths.js src/routes/authRoutes.js tests/auth.test.js
@@ -769,7 +795,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`（Task 2）。
 - Produces（`src/schemas/cart.schema.js`）：`{ addCartBodySchema, updateCartBodySchema, getCartRequestSchema, addCartRequestSchema, updateCartRequestSchema, deleteCartRequestSchema, getCartResponseSchema, mutateCartResponseSchema }`。
 
-- [ ] **Step 1: 於 `tests/cart.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/cart.test.js` 加入新測試**
 
 在檔案內最後一個 `it` 之後、結尾 `});` 之前插入：
 
@@ -819,7 +845,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認結果符合預期**
+- [x] **Step 2: 執行測試，確認結果符合預期**
 
 ```bash
 npx vitest run tests/cart.test.js
@@ -827,7 +853,7 @@ npx vitest run tests/cart.test.js
 
 Expected: 除「小數 quantity」該筆測試外皆 PASS。現行手刻邏輯為 `parseInt(1.5)` 會截斷為 `1`，`Number.isInteger(1)` 為 true，故現行程式碼會回 200（視為 `quantity=1`）而非 400；這是本次遷移刻意收緊的行為（Zod 的 `z.coerce.number().int()` 對小數會直接判定非整數並回 400），Step 5 換成新實作後該筆測試才會轉為 PASS。其餘沿用既有行為的測試在此步驟應全數 PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/cart.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/cart.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -890,7 +916,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/cart.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/cart.paths.js`**
 
 ```js
 const { z } = require('zod');
@@ -957,7 +983,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/cartRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/cartRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -1112,7 +1138,7 @@ router.delete('/:itemId', dualAuth, validate(deleteCartRequestSchema), (req, res
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/cart.test.js
@@ -1120,7 +1146,7 @@ npx vitest run tests/cart.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/cart.schema.js src/openapi/paths/cart.paths.js src/routes/cartRoutes.js tests/cart.test.js
@@ -1148,7 +1174,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`（Task 2）、`queryTradeInfo`（`src/utils/ecpay.js`，既有，不變動）。
 - Produces（`src/schemas/order.schema.js`）：`{ createOrderBodySchema, payOrderBodySchema, createOrderRequestSchema, listOrdersRequestSchema, orderDetailRequestSchema, payOrderRequestSchema, checkPaymentRequestSchema, orderRecordSchema, orderDetailSchema, listOrdersResponseSchema }`。
 
-- [ ] **Step 1: 於 `tests/orders.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/orders.test.js` 加入新測試**
 
 在檔案內最後一個 `it`（`'should return 404 for non-existent order'`）之後、結尾 `});` 之前插入：
 
@@ -1184,7 +1210,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認在現行程式碼下已通過**
+- [x] **Step 2: 執行測試，確認在現行程式碼下已通過**
 
 ```bash
 npx vitest run tests/orders.test.js
@@ -1192,7 +1218,7 @@ npx vitest run tests/orders.test.js
 
 Expected: PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/order.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/order.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -1277,7 +1303,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/order.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/order.paths.js`**
 
 ```js
 const { z } = require('zod');
@@ -1354,7 +1380,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/orderRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/orderRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -1548,7 +1574,7 @@ router.post('/:id/check-payment', validate(checkPaymentRequestSchema), async (re
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/orders.test.js
@@ -1556,7 +1582,7 @@ npx vitest run tests/orders.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/order.schema.js src/openapi/paths/order.paths.js src/routes/orderRoutes.js tests/orders.test.js
@@ -1584,7 +1610,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`/`pageQuerySchema`/`limitQuerySchema`/`paginationSchema`（Task 2）。
 - Produces（`src/schemas/product.schema.js`）：`{ listProductsRequestSchema, productDetailRequestSchema, productSchema, listProductsResponseSchema }`。`productSchema` 供 Task 9（AdminProduct）重用。
 
-- [ ] **Step 1: 於 `tests/products.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/products.test.js` 加入新測試**
 
 在檔案內最後一個 `it` 之後、結尾 `});` 之前插入：
 
@@ -1613,7 +1639,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認在現行程式碼下已通過**
+- [x] **Step 2: 執行測試，確認在現行程式碼下已通過**
 
 ```bash
 npx vitest run tests/products.test.js
@@ -1621,7 +1647,7 @@ npx vitest run tests/products.test.js
 
 Expected: PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/product.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/product.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -1661,7 +1687,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/product.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/product.paths.js`**
 
 ```js
 const { z } = require('zod');
@@ -1696,7 +1722,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/productRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/productRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -1737,7 +1763,7 @@ router.get('/:id', validate(productDetailRequestSchema), (req, res) => {
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/products.test.js
@@ -1745,7 +1771,7 @@ npx vitest run tests/products.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/product.schema.js src/openapi/paths/product.paths.js src/routes/productRoutes.js tests/products.test.js
@@ -1773,7 +1799,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`/`pageQuerySchema`/`limitQuerySchema`/`paginationSchema`（Task 2）。
 - Produces（`src/schemas/adminOrder.schema.js`）：`{ listAdminOrdersRequestSchema, adminOrderDetailRequestSchema, listAdminOrdersResponseSchema, adminOrderDetailResponseSchema }`。
 
-- [ ] **Step 1: 於 `tests/adminOrders.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/adminOrders.test.js` 加入新測試**
 
 在檔案內最後一個 `it` 之後、結尾 `});` 之前插入：
 
@@ -1788,7 +1814,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認在現行程式碼下已通過**
+- [x] **Step 2: 執行測試，確認在現行程式碼下已通過**
 
 ```bash
 npx vitest run tests/adminOrders.test.js
@@ -1796,7 +1822,7 @@ npx vitest run tests/adminOrders.test.js
 
 Expected: PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/adminOrder.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/adminOrder.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -1863,7 +1889,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/adminOrder.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/adminOrder.paths.js`**
 
 ```js
 const { z } = require('zod');
@@ -1901,7 +1927,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/adminOrderRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/adminOrderRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -1958,7 +1984,7 @@ router.get('/:id', validate(adminOrderDetailRequestSchema), (req, res) => {
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/adminOrders.test.js
@@ -1966,7 +1992,7 @@ npx vitest run tests/adminOrders.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/adminOrder.schema.js src/openapi/paths/adminOrder.paths.js src/routes/adminOrderRoutes.js tests/adminOrders.test.js
@@ -1994,7 +2020,7 @@ EOF
 - Consumes: `validate`（Task 3）、`errorEnvelope`/`pageQuerySchema`/`limitQuerySchema`/`paginationSchema`（Task 2）、`productSchema`（Task 7）。
 - Produces（`src/schemas/adminProduct.schema.js`）：`{ listAdminProductsRequestSchema, createProductRequestSchema, updateProductRequestSchema, deleteProductRequestSchema, listAdminProductsResponseSchema, createProductBodySchema, updateProductBodySchema }`。`createProductBodySchema`/`updateProductBodySchema` 供 `adminProduct.paths.js` 的 `registerPath()` 使用。
 
-- [ ] **Step 1: 於 `tests/adminProducts.test.js` 加入新測試**
+- [x] **Step 1: 於 `tests/adminProducts.test.js` 加入新測試**
 
 在 `it('should update a product', ...)` 之後、`it('should delete a product', ...)` 之前插入：
 
@@ -2031,7 +2057,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認在現行程式碼下已通過**
+- [x] **Step 2: 執行測試，確認在現行程式碼下已通過**
 
 ```bash
 npx vitest run tests/adminProducts.test.js
@@ -2039,7 +2065,7 @@ npx vitest run tests/adminProducts.test.js
 
 Expected: PASS。
 
-- [ ] **Step 3: 建立 `src/schemas/adminProduct.schema.js`**
+- [x] **Step 3: 建立 `src/schemas/adminProduct.schema.js`**
 
 ```js
 const { z } = require('zod');
@@ -2098,7 +2124,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 建立 `src/openapi/paths/adminProduct.paths.js`**
+- [x] **Step 4: 建立 `src/openapi/paths/adminProduct.paths.js`**
 
 ```js
 const { z } = require('zod');
@@ -2170,7 +2196,7 @@ registry.registerPath({
 });
 ```
 
-- [ ] **Step 5: 改寫 `src/routes/adminProductRoutes.js`（全檔取代）**
+- [x] **Step 5: 改寫 `src/routes/adminProductRoutes.js`（全檔取代）**
 
 ```js
 const express = require('express');
@@ -2270,7 +2296,7 @@ router.delete('/:id', validate(deleteProductRequestSchema), (req, res) => {
 module.exports = router;
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/adminProducts.test.js
@@ -2278,7 +2304,7 @@ npx vitest run tests/adminProducts.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/schemas/adminProduct.schema.js src/openapi/paths/adminProduct.paths.js src/routes/adminProductRoutes.js tests/adminProducts.test.js
@@ -2304,7 +2330,7 @@ EOF
 - Consumes: `registry`（Task 2）、六個 `src/openapi/paths/*.paths.js`（Task 4～9，透過 require 觸發 `registerPath` 副作用）。
 - Produces: `module.exports = { generateDocument }`；`generateDocument()` 回傳完整 OpenAPI 3.0.3 document 物件（含 `openapi`、`info`、`servers`、`paths`、`components`）。Task 11 消費此函式。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 建立 `tests/openapi.generator.test.js`：
 
@@ -2330,7 +2356,7 @@ describe('OpenAPI generator', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/openapi.generator.test.js
@@ -2338,7 +2364,7 @@ npx vitest run tests/openapi.generator.test.js
 
 Expected: FAIL（`Cannot find module '../src/openapi/generator'`）。
 
-- [ ] **Step 3: 建立 `src/openapi/generator.js`**
+- [x] **Step 3: 建立 `src/openapi/generator.js`**
 
 ```js
 require('./paths/auth.paths');
@@ -2367,7 +2393,7 @@ function generateDocument() {
 module.exports = { generateDocument };
 ```
 
-- [ ] **Step 4: 改寫 `generate-openapi.js`（全檔取代）**
+- [x] **Step 4: 改寫 `generate-openapi.js`（全檔取代）**
 
 ```js
 const fs = require('fs');
@@ -2386,13 +2412,13 @@ const { generateDocument } = require('./src/openapi/generator');
 });
 ```
 
-- [ ] **Step 5: 刪除 `swagger-config.js`**
+- [x] **Step 5: 刪除 `swagger-config.js`**
 
 ```bash
 git rm swagger-config.js
 ```
 
-- [ ] **Step 6: 執行測試，確認通過**
+- [x] **Step 6: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/openapi.generator.test.js
@@ -2400,7 +2426,7 @@ npx vitest run tests/openapi.generator.test.js
 
 Expected: PASS。
 
-- [ ] **Step 7: 手動執行產檔腳本驗證**
+- [x] **Step 7: 手動執行產檔腳本驗證**
 
 ```bash
 npm run openapi
@@ -2408,7 +2434,7 @@ npm run openapi
 
 Expected: 印出 `openapi.json generated and validated successfully`，且 `openapi.json` 檔案更新（可用 `git diff openapi.json` 確認內容為新結構）。
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/openapi/generator.js generate-openapi.js tests/openapi.generator.test.js openapi.json
@@ -2432,7 +2458,7 @@ EOF
 - Consumes: `generateDocument`（Task 10）、`swagger-ui-express`。
 - Produces: `GET /openapi.json`（回傳 JSON document）、`GET /api-docs/`（回傳 Swagger UI HTML 頁）。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 建立 `tests/openapi.test.js`：
 
@@ -2457,7 +2483,7 @@ describe('OpenAPI docs endpoints', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/openapi.test.js
@@ -2465,7 +2491,7 @@ npx vitest run tests/openapi.test.js
 
 Expected: FAIL（`/openapi.json` 與 `/api-docs/` 皆回 404，因尚未掛載路由）。
 
-- [ ] **Step 3: 修改 `app.js`**
+- [x] **Step 3: 修改 `app.js`**
 
 在 `app.use('/api/orders', require('./src/routes/orderRoutes'));` 之後、`// Page Routes` 之前插入：
 
@@ -2483,7 +2509,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 （`const swaggerUi = ...` 與 `const { generateDocument } = ...` 兩行 require 需搬移至檔案頂部與其他 `require` 並列，僅 `const openapiDocument = generateDocument();` 與後續兩行路由掛載留在此插入點。）
 
-- [ ] **Step 4: 執行測試，確認通過**
+- [x] **Step 4: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/openapi.test.js
@@ -2491,7 +2517,7 @@ npx vitest run tests/openapi.test.js
 
 Expected: PASS。
 
-- [ ] **Step 5: 執行全套測試，確認無回歸**
+- [x] **Step 5: 執行全套測試，確認無回歸**
 
 ```bash
 npm test
@@ -2499,7 +2525,7 @@ npm test
 
 Expected: 全部測試檔案（含既有 6 個 + 本次新增的 4 個）皆 PASS。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app.js tests/openapi.test.js
@@ -2525,7 +2551,7 @@ EOF
 
 **Interfaces:** 無（純文件更新與歸檔）。
 
-- [ ] **Step 1: 更新 `docs/DEVELOPMENT.md` 第 84-95 行**
+- [x] **Step 1: 更新 `docs/DEVELOPMENT.md` 第 84-95 行**
 
 將原本「5. **撰寫 JSDoc**（用於 OpenAPI 生成）」步驟取代為：
 
@@ -2564,7 +2590,7 @@ router.post('/', validate(requestSchema), (req, res) => {
 ```
 ```
 
-- [ ] **Step 2: 更新 `docs/DEVELOPMENT.md` 第 159-213 行**
+- [x] **Step 2: 更新 `docs/DEVELOPMENT.md` 第 159-213 行**
 
 將整個「## JSDoc / OpenAPI 格式說明」章節（含「### 範例」「### 標記規則」）標題與內文取代為：
 
@@ -2614,7 +2640,7 @@ registry.registerPath({
 - `src/openapi/paths/*.js` 只能 require `src/schemas/*` 與 `src/openapi/registry.js`，不得 require 路由檔或 `src/database.js`
 ```
 
-- [ ] **Step 3: 更新 `docs/ARCHITECTURE.md` 第 10-11 行**
+- [x] **Step 3: 更新 `docs/ARCHITECTURE.md` 第 10-11 行**
 
 將：
 
@@ -2631,7 +2657,7 @@ registry.registerPath({
 
 （`swagger-config.js` 該行整行移除，因該檔已刪除；其設定併入 `src/openapi/generator.js`。）
 
-- [ ] **Step 4: 更新 `docs/README.md` 第 19 行**
+- [x] **Step 4: 更新 `docs/README.md` 第 19 行**
 
 將：
 
@@ -2645,7 +2671,7 @@ registry.registerPath({
 | API 文件 | zod + @asteasolutions/zod-to-openapi | 依 package.json |
 ```
 
-- [ ] **Step 5: 更新 `docs/FEATURES.md` 第 17 行**
+- [x] **Step 5: 更新 `docs/FEATURES.md` 第 17 行**
 
 將：
 
@@ -2659,7 +2685,7 @@ registry.registerPath({
 | API 文件 | ✅ 完成 | Zod + zod-to-openapi 生成 OpenAPI，Swagger UI（/api-docs） |
 ```
 
-- [ ] **Step 6: 更新 `docs/CHANGELOG.md`**
+- [x] **Step 6: 更新 `docs/CHANGELOG.md`**
 
 在 `## [Unreleased]` 區塊內、現有 `### Added` 小節之前，新增一個獨立小節（置於檔案最上方最新變更處）：
 
@@ -2670,7 +2696,7 @@ registry.registerPath({
 - 新增 `GET /api-docs` Swagger UI 瀏覽頁，`GET /openapi.json` 保留原路徑
 ```
 
-- [ ] **Step 7: 執行完整驗證**
+- [x] **Step 7: 執行完整驗證**
 
 ```bash
 npm test
@@ -2679,7 +2705,7 @@ npm run openapi
 
 Expected: 兩者皆成功（測試全數 PASS，`openapi.json` 產出且通過 swagger-parser 驗證）。
 
-- [ ] **Step 8: 歸檔計畫檔並 Commit**
+- [x] **Step 8: 歸檔計畫檔並 Commit**
 
 ```bash
 mkdir -p docs/plans/archive

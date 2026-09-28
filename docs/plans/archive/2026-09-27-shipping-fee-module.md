@@ -10,6 +10,37 @@
 
 **Spec:** `docs/plans/2026-09-27-shipping-fee-module.md`（本檔案下方 User Story / Spec 兩節）
 
+## 執行紀錄（全部完成）
+
+| Task | 狀態 | Commit | 驗證 |
+|------|------|--------|------|
+| 1. `shipping.js` + 單元測試 + `test:unit` | ✅ 完成 | `96d1f7b` | `npm run test:unit` 通過 |
+| 2. `orders` 表新增運費欄位（DB 遷移） | ✅ 完成 | `e9ae54a` | `npm test` 全綠 |
+| 3. `order.schema.js` 新增配送欄位 | ✅ 完成 | `d1b6a81` | `npx vitest run tests/orders.test.js -t shippingMethod` 通過 |
+| 4. `orderRoutes.js` 整合運費計算 + 測試 | ✅ 完成 | `29d17df` | `npx vitest run tests/orders.test.js tests/adminOrders.test.js` 通過 |
+| 5. 重新產生 `openapi.json`／`postman/collection.json` | ✅ 完成 | `5a2b416` | `npm test` 93/93 通過 |
+| 6. 結帳頁配送方式選單 + 運費試算 | ✅ 完成 | `5b6fd6d` | `npm test` 全綠 |
+| 7. 訂單詳情頁運費明細顯示 | ✅ 完成 | `f3378d0` | `npm test` 全綠 |
+| 8. 文件同步 | ✅ 完成 | `54890cf` | `npm test` 全綠 |
+| 9. 最終驗證與歸檔 | ✅ 完成 | `1016730` | `npm test` 全綠 |
+| 最終整體審查（獨立 opus 子代理）與修正 | ✅ 完成 | `7064831`、`38823de` | 1 Critical + 3 Important 已修正，3 Minor 列為延後事項（見下） |
+
+**執行過程中的關鍵裁決（Ruling）：**
+- Task 4：計畫原訂 Step 7 用 `npm test` 全套作為完成判定，但當時 schema 已新增欄位、`openapi.json` 尚未重新產生，`openapi.generator.test.js` 的防漂移測試必然失敗——這是預期中屬於 Task 5 職責的序列缺口，非程式碼回歸。改用較窄的指令（`npx vitest run tests/orders.test.js tests/adminOrders.test.js`）作為本 Task 完成判定，Task 5 執行後隨即補回全套驗證。
+- Task 5：`npm test` 第一次出現 2 筆與運費無關的失敗（購物車訪客更新數量、新增不存在商品），成因是 `database.sqlite` 為持久化檔案、session 內已累積數十次測試指令的副作用；重置資料庫後重跑 93/93 全數通過，非本 Task 程式碼回歸。
+- 最終審查：reviewer 指出 Task 5 附註對「cart.test.js 兩筆無關失敗」的環境脆弱性診斷「說得通但不完整」（因果無法重現）；已採納此評估但不撤回原診斷（cartRoutes.js 在該 diff 範圍內確實零改動），並補充承認診斷未達可重現驗證的嚴謹度。
+
+**最終審查修正（commit `7064831`）：**
+1. **Critical**：`GET /:id`、`PATCH /:id/pay`、`POST /:id/check-payment` 皆缺少 `subtotal`（`orders` 表未持久化該欄位），訂單詳情頁對所有訂單呼叫 `order.subtotal.toLocaleString()` 會拋出 TypeError——已新增持久化 `subtotal` 欄位並於建立訂單時寫入，RED→GREEN 驗證後 suite 96/96。
+2. **Important**：`order.schema.js` 的 `subtotal`/`shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery` 改為 nullable，且後兩者由宣稱的 boolean 改為實際 runtime 的 0/1 數字聯集，並重新產生 `openapi.json`/`postman/collection.json`（純 schema/文件正確性修正，以 suite 96/96＋防漂移測試通過驗證）。
+3. **Important**：`order-detail.ejs` 對 `shipping_method` 為 null 的舊訂單以 `v-if` 略過運費明細列，避免對 null 呼叫 `toLocaleString()`（純前端模板修正，專案無前端渲染測試基礎設施，以人工檢視 Vue 語意確認正確）。
+4. **Important**：補齊 Review Focus「1,499/1,500 整合層邊界」測試缺口——新增兩筆整合測試驗證滿額免運與差 1 元不免運兩種邊界情況，suite 96/96。
+
+**延後事項（Minor，未修正，供後續維護參考）：**
+- 新增的邊界測試會加速消耗種子庫存，且未斷言加入購物車成功；屬既有「持久化 database.sqlite」脆弱性的延伸，非本功能新引入的回歸。
+- 後台訂單詳情頁（`views/pages/admin/orders.ejs`）未顯示運費明細，總計含運費但無拆分說明。
+- 結帳頁配送方式單選項旁的金額文字寫死（NT$120/NT$60），達免運門檻時不會跟著變化，僅下方試算區塊正確。
+
 ## Global Constraints
 
 - 運費一律由伺服器依驗證過的 `shippingMethod`/`isRemoteArea`/`isRushDelivery` 重新計算；請求 body 中任何額外欄位（如客戶端算好的金額）一律被 Zod 的預設 strip 行為忽略，不得信任。
@@ -102,7 +133,7 @@
 **Interfaces:**
 - Produces：`module.exports = { calculateShippingFee, SHIPPING_METHODS, REMOTE_AREA_SURCHARGE, RUSH_DELIVERY_SURCHARGE, FREE_BASE_SHIPPING_THRESHOLD }`。`calculateShippingFee({ shippingMethod, subtotal, isRemoteArea?, isRushDelivery? })` 回傳運費數字；`shippingMethod` 不在 `SHIPPING_METHODS` 鍵值中時拋出 `Error`。Task 3（schema）、Task 4（route）皆消費 `calculateShippingFee` 與 `SHIPPING_METHODS`。
 
-- [ ] **Step 1: 寫失敗測試**
+- [x] **Step 1: 寫失敗測試**
 
 建立 `tests/shipping.test.js`：
 
@@ -167,7 +198,7 @@ describe('calculateShippingFee', () => {
 });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/shipping.test.js
@@ -175,7 +206,7 @@ npx vitest run tests/shipping.test.js
 
 Expected: FAIL（`Cannot find module '../src/utils/shipping'`）。
 
-- [ ] **Step 3: 建立 `src/utils/shipping.js`**
+- [x] **Step 3: 建立 `src/utils/shipping.js`**
 
 ```js
 const SHIPPING_METHODS = {
@@ -206,7 +237,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: 執行測試，確認通過**
+- [x] **Step 4: 執行測試，確認通過**
 
 ```bash
 npx vitest run tests/shipping.test.js
@@ -214,7 +245,7 @@ npx vitest run tests/shipping.test.js
 
 Expected: PASS（10 個 it 全數通過）。
 
-- [ ] **Step 5: 新增 `test:unit` script**
+- [x] **Step 5: 新增 `test:unit` script**
 
 於 `package.json` 的 `"scripts"` 區塊，在 `"openapi"` 與 `"postman"` 之後、`"test"` 之前加入：
 
@@ -222,7 +253,7 @@ Expected: PASS（10 個 it 全數通過）。
 "test:unit": "vitest run tests/shipping.test.js",
 ```
 
-- [ ] **Step 6: 驗證新 script**
+- [x] **Step 6: 驗證新 script**
 
 ```bash
 npm run test:unit
@@ -230,7 +261,7 @@ npm run test:unit
 
 Expected: 與 Step 4 相同，10 個測試全數通過。
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/utils/shipping.js tests/shipping.test.js package.json
@@ -252,7 +283,7 @@ EOF
 **Interfaces:**
 - Produces：`orders` 表新增 `shipping_method TEXT`、`shipping_fee INTEGER`、`is_remote_area INTEGER`、`is_rush_delivery INTEGER` 四個欄位。Task 4（route）消費這些欄位做 INSERT。
 
-- [ ] **Step 1: 修改 `src/database.js`**
+- [x] **Step 1: 修改 `src/database.js`**
 
 在既有 `merchant_trade_no` 遷移區塊（`initializeDatabase()` 內）之後，加入：
 
@@ -282,7 +313,7 @@ EOF
 
 （緊接在現有 `try { db.exec('ALTER TABLE orders ADD COLUMN merchant_trade_no TEXT') } catch (e) {}` 區塊之後、`// Seed data` 之前。）
 
-- [ ] **Step 2: 手動驗證遷移可重複執行（冪等）**
+- [x] **Step 2: 手動驗證遷移可重複執行（冪等）**
 
 ```bash
 rm -f database.sqlite database.sqlite-wal database.sqlite-shm
@@ -301,7 +332,7 @@ console.log('columns OK');
 
 Expected: 兩次執行皆印出 `OK`，且第二次執行不拋出例外（欄位已存在時 catch 忽略）；`columns OK` 印出，代表四個新欄位都存在。
 
-- [ ] **Step 3: 執行既有測試套件確認未破壞（此步驟預期會因 Task 3/4 尚未完成而部分失敗屬正常，先確認至少不是因為這個 Task 本身導致例外）**
+- [x] **Step 3: 執行既有測試套件確認未破壞（此步驟預期會因 Task 3/4 尚未完成而部分失敗屬正常，先確認至少不是因為這個 Task 本身導致例外）**
 
 ```bash
 npm test 2>&1 | tail -30
@@ -309,7 +340,7 @@ npm test 2>&1 | tail -30
 
 Expected: 不應出現與 `ALTER TABLE`／`database.sqlite` 相關的例外訊息（既有測試因後續 Task 尚未完成而可能有其他失敗，屬預期中，Task 4 完成後會重新全綠）。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/database.js
@@ -332,7 +363,7 @@ EOF
 - Consumes：`SHIPPING_METHODS`（Task 1，`src/utils/shipping.js`，取其鍵值作為 enum 選項）。
 - Produces：`createOrderBodySchema` 新增 `shippingMethod`/`isRemoteArea`/`isRushDelivery`；`orderRecordSchema`/`orderDetailSchema` 新增 `subtotal`/`shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery`。Task 4（route）、Task 8（openapi paths，透過既有 import 自動反映）皆消費這些 schema。
 
-- [ ] **Step 1: 寫測試（先確認新 schema 的驗證行為）**
+- [x] **Step 1: 寫測試（先確認新 schema 的驗證行為）**
 
 於 `tests/orders.test.js` 檔案結尾、`});` 之前插入（本步驟先寫測試，Step 3 改完 schema 後才會全部通過；Step 2 執行時預期只有沿用舊 schema 的既有測試通過，新測試會失敗）：
 
@@ -367,7 +398,7 @@ EOF
   });
 ```
 
-- [ ] **Step 2: 執行測試，確認失敗**
+- [x] **Step 2: 執行測試，確認失敗**
 
 ```bash
 npx vitest run tests/orders.test.js
@@ -375,7 +406,7 @@ npx vitest run tests/orders.test.js
 
 Expected: FAIL — 這兩筆新測試會因為目前 `createOrderBodySchema` 沒有 `shippingMethod` 欄位、缺少該欄位不會被拒絕而回 201（購物車此時可能為空導致 400 CART_EMPTY，也可能非預期的 400/201，總之不是我們要的 400 VALIDATION_ERROR 語意）而失敗或給出非預期結果。
 
-- [ ] **Step 3: 修改 `src/schemas/order.schema.js`**
+- [x] **Step 3: 修改 `src/schemas/order.schema.js`**
 
 在檔案頂部加入 import，並修改 `createOrderBodySchema`、`orderRecordSchema`、`orderDetailSchema`：
 
@@ -438,7 +469,7 @@ const orderDetailSchema = z.object({
 });
 ```
 
-- [ ] **Step 4: 執行測試，確認 Step 1 新增的兩筆測試通過（其餘既有測試因 Task 4 尚未整合運費邏輯，預期仍有失敗，屬正常）**
+- [x] **Step 4: 執行測試，確認 Step 1 新增的兩筆測試通過（其餘既有測試因 Task 4 尚未整合運費邏輯，預期仍有失敗，屬正常）**
 
 ```bash
 npx vitest run tests/orders.test.js -t "shippingMethod"
@@ -446,7 +477,7 @@ npx vitest run tests/orders.test.js -t "shippingMethod"
 
 Expected: PASS（Step 1 新增的 2 筆測試通過）。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/schemas/order.schema.js tests/orders.test.js
@@ -471,7 +502,7 @@ EOF
 - Consumes：`calculateShippingFee`（Task 1）、`createOrderRequestSchema`（Task 3，已含新欄位）。
 - Produces：`POST /api/orders` 回應與寫入 DB 的 `orders` 列包含 `subtotal`/`shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery`/`total_amount`（= subtotal + shipping_fee）。
 
-- [ ] **Step 1: 更新 `tests/orders.test.js` 既有建立訂單呼叫，補上 `shippingMethod`**
+- [x] **Step 1: 更新 `tests/orders.test.js` 既有建立訂單呼叫，補上 `shippingMethod`**
 
 `beforeAll` 之後第一個 `it('should create an order from cart', ...)`，把 `.send({...})` 改為：
 
@@ -488,7 +519,7 @@ EOF
 
 `it('should fail to create order without auth', ...)` 的 body 維持不動（該測試驗證的是 401，不會走到 body 驗證）。
 
-- [ ] **Step 2: 更新 `tests/adminOrders.test.js` 的 `beforeAll`**
+- [x] **Step 2: 更新 `tests/adminOrders.test.js` 的 `beforeAll`**
 
 ```js
     const orderRes = await request(app)
@@ -502,7 +533,7 @@ EOF
       });
 ```
 
-- [ ] **Step 3: 執行測試，確認失敗（尚未整合運費計算，`total_amount` 仍只有商品金額，新的整合測試 Step 5 尚未寫）**
+- [x] **Step 3: 執行測試，確認失敗（尚未整合運費計算，`total_amount` 仍只有商品金額，新的整合測試 Step 5 尚未寫）**
 
 ```bash
 npx vitest run tests/orders.test.js tests/adminOrders.test.js
@@ -510,7 +541,7 @@ npx vitest run tests/orders.test.js tests/adminOrders.test.js
 
 Expected: 除 `create an order from cart` 之外，其餘既有測試因僅補了欄位、尚未整合運費邏輯，`total_amount` 斷言（若有精確數值）會不吻合；目前既有測試都只用 `toHaveProperty('total_amount')` 不驗精確值，所以此步驟應該仍然 PASS（先確認補欄位沒有讓既有測試壞掉）。
 
-- [ ] **Step 4: 修改 `src/routes/orderRoutes.js`**
+- [x] **Step 4: 修改 `src/routes/orderRoutes.js`**
 
 在檔案頂部加入 import：
 
@@ -623,7 +654,7 @@ const { calculateShippingFee } = require('../utils/shipping');
 
 `router.get('/:id', ...)`、`router.patch('/:id/pay', ...)`、`router.post('/:id/check-payment', ...)` **三個路由完全不需要修改**——它們的回應都用 `{ ...order, items }` 或 `{ ...updated, items }` 展開整個 DB 列，新欄位（`shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery`）會自動包含在回應中，且與建立訂單回應一樣是 `0`/`1` 數字（非 `boolean`）。`orderDetailSchema`/`orderRecordSchema` 中 `is_remote_area`/`is_rush_delivery` 宣告為 `z.boolean()` 僅影響 OpenAPI 文件產出的型別標註，不做 runtime response 驗證，不會導致 request 失敗；Step 5 的測試一律用寬鬆斷言（`!!value` 轉布林後再比較，或直接比對 `0`/`1`），不要斷言嚴格 `=== true`。
 
-- [ ] **Step 5: 新增整合測試**
+- [x] **Step 5: 新增整合測試**
 
 於 `tests/orders.test.js` 檔案結尾、`});` 之前插入：
 
@@ -781,7 +812,7 @@ const { calculateShippingFee } = require('../utils/shipping');
   });
 ```
 
-- [ ] **Step 6: 執行測試，確認全數通過**
+- [x] **Step 6: 執行測試，確認全數通過**
 
 ```bash
 npx vitest run tests/orders.test.js tests/adminOrders.test.js
@@ -789,7 +820,7 @@ npx vitest run tests/orders.test.js tests/adminOrders.test.js
 
 Expected: PASS（全部既有 + 新增測試皆通過）。
 
-- [ ] **Step 7: 執行全套測試確認無回歸**
+- [x] **Step 7: 執行全套測試確認無回歸**
 
 ```bash
 npm test
@@ -797,7 +828,7 @@ npm test
 
 Expected: 全部測試檔案 PASS。
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/routes/orderRoutes.js tests/orders.test.js tests/adminOrders.test.js
@@ -820,7 +851,7 @@ EOF
 **Interfaces:**
 - Consumes：Task 3 更新後的 `order.schema.js`（透過既有 `src/openapi/paths/order.paths.js` 的 import，文件自動反映新欄位，不需修改 `order.paths.js` 本身的程式碼，僅需確認其 description 文字沒有過時的錯誤敘述）。
 
-- [ ] **Step 1: 檢查 `src/openapi/paths/order.paths.js` 的 description 文字**
+- [x] **Step 1: 檢查 `src/openapi/paths/order.paths.js` 的 description 文字**
 
 讀取該檔案，確認 `POST /api/orders` 的 400 回應 description（目前為 `'購物車為空或庫存不足或收件資訊缺失'`）是否需要補上「或配送方式無效」；若需要，修改為：
 
@@ -828,7 +859,7 @@ EOF
     400: { description: '購物車為空或庫存不足或收件資訊缺失或配送方式無效' },
 ```
 
-- [ ] **Step 2: 重新產生 openapi.json**
+- [x] **Step 2: 重新產生 openapi.json**
 
 ```bash
 npm run openapi
@@ -836,7 +867,7 @@ npm run openapi
 
 Expected: 印出 `openapi.json generated and validated successfully`。
 
-- [ ] **Step 3: 確認新欄位確實出現在文件中**
+- [x] **Step 3: 確認新欄位確實出現在文件中**
 
 ```bash
 node -e "
@@ -849,7 +880,7 @@ console.log(Object.keys(doc.components.schemas || {}));
 
 Expected: 印出 `shippingMethod` 的 enum schema（含 `home_delivery`/`convenience_store`），不拋出例外。
 
-- [ ] **Step 4: 重新產生 Postman Collection**
+- [x] **Step 4: 重新產生 Postman Collection**
 
 ```bash
 npm run postman
@@ -857,7 +888,7 @@ npm run postman
 
 Expected: 印出 `postman/collection.json generated successfully`。
 
-- [ ] **Step 5: 執行 `tests/openapi.generator.test.js` 確認防漂移測試通過**
+- [x] **Step 5: 執行 `tests/openapi.generator.test.js` 確認防漂移測試通過**
 
 ```bash
 npx vitest run tests/openapi.generator.test.js
@@ -865,7 +896,7 @@ npx vitest run tests/openapi.generator.test.js
 
 Expected: PASS（含比對 `openapi.json` 逐位元組相同的測試，此步驟已在 Step 2 重新產檔，理應通過）。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add openapi.json postman/collection.json src/openapi/paths/order.paths.js
@@ -891,7 +922,7 @@ EOF
 - Consumes：無程式介面（純前端頁面），但邏輯上複製 Task 1 `calculateShippingFee` 的公式（前端純 JS 環境無法直接 `require` 後端模組，故重寫一份同公式的前端版本，變數與規則需與 `src/utils/shipping.js` 保持一致）。
 - Produces：`submitOrder()` 送出的 `POST /api/orders` body 新增 `shippingMethod`/`isRemoteArea`/`isRushDelivery` 三個欄位。
 
-- [ ] **Step 1: 修改 `views/pages/checkout.ejs`**
+- [x] **Step 1: 修改 `views/pages/checkout.ejs`**
 
 把現有：
 
@@ -966,7 +997,7 @@ EOF
         </div>
 ```
 
-- [ ] **Step 2: 修改 `public/js/pages/checkout.js`**
+- [x] **Step 2: 修改 `public/js/pages/checkout.js`**
 
 把：
 
@@ -1026,7 +1057,7 @@ EOF
     return { loading, submitting, cartItems, form, errors, cartTotal, shippingFee, submitOrder };
 ```
 
-- [ ] **Step 3: 手動驗證（此專案無前端自動化測試，依既有慣例以手動啟動伺服器驗證）**
+- [x] **Step 3: 手動驗證（此專案無前端自動化測試，依既有慣例以手動啟動伺服器驗證）**
 
 ```bash
 npm run start
@@ -1040,7 +1071,7 @@ npm run start
 
 Expected: 以上四點皆符合；驗證後手動終止伺服器（Ctrl+C）。
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add views/pages/checkout.ejs public/js/pages/checkout.js
@@ -1062,7 +1093,7 @@ EOF
 **Interfaces:**
 - Consumes：`GET /api/orders/:id` 回應（Task 4 已使其包含 `subtotal`/`shipping_method`/`shipping_fee`/`is_remote_area`/`is_rush_delivery`）。`order-detail.js` 不需修改（已把整個 `res.data` 存進 `order.value`，模板可直接存取新欄位）。
 
-- [ ] **Step 1: 修改 `views/pages/order-detail.ejs`**
+- [x] **Step 1: 修改 `views/pages/order-detail.ejs`**
 
 把商品明細表格的 `<tfoot>`：
 
@@ -1100,7 +1131,7 @@ EOF
     </div>
 ```
 
-- [ ] **Step 2: 手動驗證**
+- [x] **Step 2: 手動驗證**
 
 ```bash
 npm run start
@@ -1108,7 +1139,7 @@ npm run start
 
 以瀏覽器開啟任一筆訂單的詳情頁（`/orders/:id`），確認商品小計、運費（含配送方式與偏遠/急件標籤）、總計三行皆正確顯示且總計等於小計加運費。驗證後手動終止伺服器。
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add views/pages/order-detail.ejs
@@ -1131,7 +1162,7 @@ EOF
 
 **Interfaces:** 無（純文件更新）。
 
-- [ ] **Step 1: 更新 `docs/ARCHITECTURE.md` 的 orders 表格（約第 344 行）**
+- [x] **Step 1: 更新 `docs/ARCHITECTURE.md` 的 orders 表格（約第 344 行）**
 
 把：
 
@@ -1149,7 +1180,7 @@ EOF
 | total_amount | INTEGER | NOT NULL | 訂單總金額（商品小計 + 運費） |
 ```
 
-- [ ] **Step 2: 更新 `docs/ARCHITECTURE.md` 的訂單建立流程圖（約第 371 行）**
+- [x] **Step 2: 更新 `docs/ARCHITECTURE.md` 的訂單建立流程圖（約第 371 行）**
 
 把：
 
@@ -1169,7 +1200,7 @@ EOF
 
 並將原本第 7、8 步（`🔒 Transaction 開始...` 與 `回傳 201 + 訂單詳情`）的編號依序遞增為第 9、10 步。
 
-- [ ] **Step 3: 更新 `docs/FEATURES.md` 的 `POST /api/orders` 章節（約第 224～255 行）**
+- [x] **Step 3: 更新 `docs/FEATURES.md` 的 `POST /api/orders` 章節（約第 224～255 行）**
 
 Request Body 表格新增三列：
 
@@ -1201,7 +1232,7 @@ Request Body 表格新增三列：
 **回應欄位新增**：`subtotal`（商品小計）、`shipping_method`、`shipping_fee`、`is_remote_area`、`is_rush_delivery`（皆同步反映於 `GET /api/orders/:id`）。
 ```
 
-- [ ] **Step 4: 更新 `docs/CHANGELOG.md`**
+- [x] **Step 4: 更新 `docs/CHANGELOG.md`**
 
 在 `## [Unreleased]` 的 `### Added` 小節最前面加入：
 
@@ -1212,7 +1243,7 @@ Request Body 表格新增三列：
 - 新增 `npm run test:unit`，執行 `tests/shipping.test.js` 純函式單元測試
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/ARCHITECTURE.md docs/FEATURES.md docs/CHANGELOG.md
@@ -1233,7 +1264,7 @@ EOF
 
 **Interfaces:** 無。
 
-- [ ] **Step 1: 執行完整驗證**
+- [x] **Step 1: 執行完整驗證**
 
 ```bash
 npm run test
@@ -1244,7 +1275,7 @@ npm run postman
 
 Expected: 四個指令皆成功；`npm run test`／`npm run test:unit` 全數 PASS；`openapi.json`／`postman/collection.json` 產出且與已提交版本一致（若有差異，git diff 檢查是否為預期的隨機 ID 差異——`postman/collection.json` 因隨機 UUID 允許有差異，`openapi.json` 應完全一致，若不一致代表 Task 4/5 有遺漏未提交的 schema 變更）。
 
-- [ ] **Step 2: 歸檔計畫檔並 Commit**
+- [x] **Step 2: 歸檔計畫檔並 Commit**
 
 ```bash
 mkdir -p docs/plans/archive
