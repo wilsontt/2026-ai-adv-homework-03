@@ -7,6 +7,13 @@
 ### Added
 - 新增 GitHub Actions CI（`.github/workflows/test.yml`）：push／PR 時自動執行 `npm run test:unit` 與 `npm run test:integration`；因 CI 無 `.env`，額外於 Integration Test 步驟設定 CI 專用 `JWT_SECRET`（非正式環境密鑰）避免 `jwt.sign()` 因缺少必要環境變數而失敗
 
+### Fixed
+- 修正商品無圖時的預設圖片網址已失效（404）問題：`index.ejs`／`product-detail.ejs`／`cart.ejs`／`admin/products.ejs`／`public/js/pages/index.js` 五處共用的 Unsplash fallback 圖片已被下架，改用已驗證可用的圖片網址
+
+### Docs
+- 補齊 `docs/ARCHITECTURE.md` 目錄結構（Integration/E2E Test、Playwright、GitHub Actions、Postman generator 等此前未同步的檔案），新增「測試分層與 CI」「Postman Collection 產生」章節
+- `docs/CHANGELOG.md` 由 `[Unreleased]`／版本號格式改版為依日期新到舊排序記錄
+
 ## 2026-09-27
 
 ### Added
