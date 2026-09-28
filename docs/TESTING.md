@@ -263,4 +263,8 @@ it('should work with session ID', async () => {
 
 `npm run test:e2e` 使用 Playwright，測試前須先手動執行 `npm run start` 啟動伺服器（測試本身不會自動啟動），對 `http://localhost:3001` 進行真實瀏覽器操作，涵蓋登入、加入購物車、結帳、綠界付款（網路ATM／土地銀行測試環境）到訂單狀態確認為 `paid` 的完整流程。因涉及第三方頁面（綠界／土地銀行測試環境），其 DOM 結構不受本專案控制，未來對方介面異動可能導致測試失效，需視情況更新 `tests/e2e/checkout-ecpay.spec.js` 的選擇器。
 
+## CI（GitHub Actions）
+
+`.github/workflows/test.yml` 在每次 push 或開 PR 時自動執行 `npm run test:unit` 與 `npm run test:integration`（不含 E2E，不啟動任何服務）。由於 CI 上不存在專案本機的 `.env`（已 gitignore），而 `JWT_SECRET` 在程式碼中沒有預設值，workflow 於「Run Integration Tests」步驟額外設定 `JWT_SECRET` 為僅供 CI 內簽發測試 JWT 使用的隨機字串（非正式環境密鑰）；其餘環境變數皆有安全預設值，CI 上缺少 `.env` 不影響其行為。
+
 測試產出（`test-results/`、`playwright-report/`）不納入版控（見 `.gitignore`），每次執行需要獨立截圖與報告時直接查看本機檔案即可。
