@@ -7,7 +7,7 @@ createApp({
     const loading = ref(true);
 
     const featuredImages = [
-      'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=400',
+      'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=400',
       'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=400',
       'https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=400',
       'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=400',
