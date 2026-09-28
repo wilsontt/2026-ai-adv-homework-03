@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm run test:unit
+
+      - name: Run Integration Tests
+        env:
+          # 專案未提交 .env（見 .gitignore），JWT_SECRET 在 src/routes/authRoutes.js /
+          # src/middleware/authMiddleware.js 中沒有預設值，若缺少會讓 jwt.sign() 直接
+          # 拋出例外導致註冊/登入失敗。此處僅為 CI 內簽發測試用 JWT 的隨機字串，
+          # 並非任何正式環境使用的密鑰。
+          JWT_SECRET: ci-test-jwt-secret-not-for-production
+        run: npm run test:integration
